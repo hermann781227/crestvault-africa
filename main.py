@@ -28,7 +28,7 @@ DB_FILE = "crestvault_v2_db.json"
 
 _db_io_lock = threading.RLock()
 
-app = FastAPI(title="Crest Vault Africa OS v2")
+app = FastAPI(title="Crest Vault Africa ")
 os.makedirs("public", exist_ok=True)
 app.mount("/static", StaticFiles(directory="public"), name="static")
 
@@ -125,7 +125,7 @@ def get_session(x_session_token: Optional[str] = Header(default=None)):
 def home(): return FileResponse("public/index.html")
 
 @app.get("/api/health")
-def health(): return {"status": "ONLINE", "brand": "Crest Vault Africa OS v2"}
+def health(): return {"status": "ONLINE", "brand": "Crest Vault Africa "}
 
 @app.post("/api/auth/signup")
 def signup(req: SignupReq):
