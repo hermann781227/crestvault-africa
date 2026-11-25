@@ -28,7 +28,7 @@ DB_FILE = "crestvault_v2_db.json"
 
 _db_io_lock = threading.RLock()
 
-app = FastAPI(title="Crest Vault Africa ")
+app = FastAPI(title="Crest Vault Africa")
 os.makedirs("public", exist_ok=True)
 app.mount("/static", StaticFiles(directory="public"), name="static")
 
@@ -125,7 +125,7 @@ def get_session(x_session_token: Optional[str] = Header(default=None)):
 def home(): return FileResponse("public/index.html")
 
 @app.get("/api/health")
-def health(): return {"status": "ONLINE", "brand": "Crest Vault Africa "}
+def health(): return {"status": "ONLINE", "brand": "Crest Vault Africa"}
 
 @app.post("/api/auth/signup")
 def signup(req: SignupReq):
@@ -250,7 +250,6 @@ def render_doc(doc_type: str, ref_id: str, token: str = ""):
         tr_html = "".join([f"<tr><th>{k}</th><td>{v}</td></tr>" for k, v in rows])
         verify_url = f"{APP_URL}/api/docs/{doc_type}/{ref_id}"
         
-        # --- NEW: GENERATE SCANNABLE QR CODE ---
         qr = qrcode.QRCode(version=1, box_size=10, border=2)
         qr.add_data(verify_url)
         qr.make(fit=True)
@@ -262,7 +261,6 @@ def render_doc(doc_type: str, ref_id: str, token: str = ""):
         
         logo_url = f"{APP_URL}/static/logo.png"
         
-        # --- NEW: WATERMARK AND QR HTML TEMPLATE ---
         html_content = f"""
         <!DOCTYPE html>
         <html>
@@ -270,45 +268,24 @@ def render_doc(doc_type: str, ref_id: str, token: str = ""):
             <title>{title}</title>
             <style>
                 body {{ font-family: Arial, sans-serif; padding: 32px; color: #0f172a; position: relative; }}
-                
-                /* WATERMARK CSS */
-                .watermark {{
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    opacity: 0.08; /* Very faint */
-                    z-index: -1;
-                    pointer-events: none; /* Lets clicks pass through */
-                    width: 60%;
-                    max-width: 600px;
-                }}
-
+                .watermark {{ position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.08; z-index: -1; pointer-events: none; width: 60%; max-width: 600px; }}
                 table {{ width: 100%; border-collapse: collapse; margin-top: 16px; position: relative; z-index: 1; background: rgba(255,255,255,0.8); }}
                 th, td {{ border: 1px solid #cbd5e1; padding: 10px; text-align: left; }}
                 th {{ background: #f1f5f9; width: 230px; }}
                 .hdr {{ display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #059669; padding-bottom: 12px; position: relative; z-index: 1; }}
                 .qr {{ text-align: center; font-size: 11px; font-weight: bold; }}
                 .qr img {{ border: 2px solid #059669; padding: 4px; background: #fff; border-radius: 6px; }}
-                @media print {{ 
-                    button {{ display: none; }} 
-                    .watermark {{ opacity: 0.1; position: absolute; }}
-                    body {{ background: white; }}
-                    table {{ background: transparent; }}
-                }}
+                @media print {{ button {{ display: none; }} .watermark {{ opacity: 0.1; position: absolute; }} body {{ background: white; }} table {{ background: transparent; }} }}
             </style>
         </head>
         <body>
-            <!-- Watermark Image -->
             <img src="{logo_url}" class="watermark" alt="Watermark" />
-
             <div class="hdr">
                 <div>
-                    <h1 style="margin:0;color:#059669">CREST VAULT AFRICA OS</h1>
+                    <h1 style="margin:0;color:#059669">CREST VAULT AFRICA</h1>
                     <div>Official Agency-Standard Trade and Compliance Record</div>
                 </div>
                 <div class="qr">
-                    <!-- Scannable QR Code -->
                     <img src="{qr_data_uri}" width="100" height="100" alt="Scan to Verify"/><br/>
                     Scan to Verify
                 </div>
