@@ -1,0 +1,6 @@
+fastapi 
+uvicorn 
+pydantic 
+python-dotenv 
+xrpl-py 
+qrcode[pil] 
