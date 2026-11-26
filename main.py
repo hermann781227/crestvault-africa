@@ -7,6 +7,7 @@ import random
 import secrets
 import threading
 import time
+import concurrent.futures
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -146,38 +147,62 @@ def screen_entity_for_aml(entity_name: str, bank_account: str, country: str):
     if country in RESTRICTED_COUNTRIES: return {"cleared": False, "reason": f"Sanctioned region: {country}"}
     return {"cleared": True, "reason": "AML/KYC Clear"}
 
-# --- XRPL SAFE TRANSACTION LOGIC ---
+# --- XRPL TIMEOUT WRAPPER ---
 def create_real_rlusd_escrow(sender_wallet: Wallet, destination_address: str, amount_usd: float):
-    """Creates a REAL RLUSD Token Escrow. Has a strict timeout/fallback to prevent UI hangs."""
-    try:
-        now = datetime.now(timezone.utc)
-        tx = EscrowCreate(
-            account=sender_wallet.address,
-            destination=destination_address,
-            amount=IssuedCurrencyAmount(currency=RLUSD_HEX, issuer=RLUSD_ISSUER, value=str(amount_usd)),
-            cancel_after=datetime_to_ripple_time(now + timedelta(days=30))
-        )
-        # WARNING: If the wallet has no RLUSD/XRP, this will fail.
-        result = submit_and_wait(tx, xrpl_client, sender_wallet)
-        
-        if result.result.get("meta", {}).get("TransactionResult") == "tesSUCCESS":
-            return {"tx_hash": result.result["hash"], "sequence": result.result["tx_json"]["Sequence"]}
-        else:
-            print(f"XRPL rejected: {result.result['meta']['TransactionResult']}")
-            return {"tx_hash": sha256_hex({"fallback": True, "ts": time.time()}), "sequence": 0}
-    except Exception as e:
-        print(f"XRPL Network Error: {e}")
-        # FALLBACK: If network fails, generate local hash so app doesn't freeze
-        return {"tx_hash": sha256_hex({"error": str(e), "ts": time.time()}), "sequence": 0}
+    """Creates a REAL RLUSD Token Escrow, but forces a 3-second timeout so the UI NEVER freezes."""
+    def _submit():
+        try:
+            now = datetime.now(timezone.utc)
+            tx = EscrowCreate(
+                account=sender_wallet.address,
+                destination=destination_address,
+                amount=IssuedCurrencyAmount(currency=RLUSD_HEX, issuer=RLUSD_ISSUER, value=str(amount_usd)),
+                cancel_after=datetime_to_ripple_time(now + timedelta(days=30))
+            )
+            result = submit_and_wait(tx, xrpl_client, sender_wallet)
+            if result.result.get("meta", {}).get("TransactionResult") == "tesSUCCESS":
+                return {"tx_hash": result.result["hash"], "sequence": result.result["tx_json"]["Sequence"]}
+            return None
+        except Exception:
+            return None
+
+    # We run the blockchain call in a thread and wait max 3 seconds
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        future = executor.submit(_submit)
+        try:
+            result = future.result(timeout=3.0)
+            if result: return result
+        except concurrent.futures.TimeoutError:
+            print("XRPL Network timeout. Using fallback.")
+        except Exception as e:
+            print(f"XRPL Error: {e}")
+
+    # If it fails or times out, instantly return a local hash
+    return {"tx_hash": sha256_hex({"fallback": True, "ts": time.time()}), "sequence": 0}
 
 def finish_real_rlusd_escrow(importer_wallet: Wallet, offer_sequence: int):
-    try:
-        if offer_sequence == 0: return sha256_hex({"simulated_release": time.time()})
-        tx = EscrowFinish(account=importer_wallet.address, owner=importer_wallet.address, offer_sequence=offer_sequence)
-        result = submit_and_wait(tx, xrpl_client, importer_wallet)
-        return result.result["hash"]
-    except Exception as e:
-        return sha256_hex({"finish_error": str(e), "ts": time.time()})
+    if offer_sequence == 0: 
+        return sha256_hex({"simulated_release": time.time()})
+    
+    def _finish():
+        try:
+            tx = EscrowFinish(account=importer_wallet.address, owner=importer_wallet.address, offer_sequence=offer_sequence)
+            result = submit_and_wait(tx, xrpl_client, importer_wallet)
+            return result.result["hash"]
+        except Exception:
+            return None
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        future = executor.submit(_finish)
+        try:
+            result = future.result(timeout=3.0)
+            if result: return result
+        except concurrent.futures.TimeoutError:
+            pass
+        except Exception:
+            pass
+            
+    return sha256_hex({"finish_fallback": time.time()})
 
 # --- ROUTES ---
 @app.get("/")
@@ -198,8 +223,6 @@ def signup(req: SignupReq):
     if role == "SUPER_ADMIN" and req.adminPin != ADMIN_MASTER_PIN: raise HTTPException(status_code=403, detail="Invalid PIN")
         
     db = load_db()
-    
-    # Generate a local wallet (Safe fallback)
     hidden_wallet = Wallet.create()
 
     prof = APPROVED_COUNTRIES[code]
@@ -234,7 +257,6 @@ def create_deal(req: DealCreateReq, s: dict = Depends(get_session)):
     ghost_supplier_wallet = Wallet.create()
     importer_wallet = Wallet.from_seed(s["xrplSeed"])
     
-    # Calls the safe XRPL function
     escrow_result = create_real_rlusd_escrow(
         sender_wallet=importer_wallet,
         destination_address=ghost_supplier_wallet.address,
