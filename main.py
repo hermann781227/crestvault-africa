@@ -1106,3 +1106,103 @@ def render_doc(doc_type: str, ref_id: str, token: str = ""):
         ]
         deal = next((x for x in db.get("escrowDeals", []) if x.get("id") == ref_id), None)
         inv = next((x for x in db.get("invoices", []) if x.get("id") == ref_id), None)
+        bch = next((x for x in db.get("batches", []) if x.get("id") == ref_id), None)
+
+        if deal:
+            rows += [
+                ("Incoterm", f"{deal.get('incoterm')} - {deal.get('incotermName')}"),
+                ("Supplier", str(deal.get("supplierName"))),
+                ("Supplier Bank Payout", f"{deal.get('supplierBankName')} - {deal.get('supplierAccountNumber')}"),
+                (
+                    "Goods Value & Split",
+                    f"${deal.get('goodsUsd')} ({deal.get('localGoodsAmount', 0):,.2f} {deal.get('currency')}) | {deal.get('splitPct1')}% / {deal.get('splitPct2')}%",
+                ),
+                ("Freight and Customs", f"Freight ${deal.get('freightUsd')} - Customs ${deal.get('customsUsd')}"),
+                (
+                    "Transport and Permits",
+                    f"B/L: {deal.get('bolNumber')} - Ins: {deal.get('insurancePolicy')} - CoO: {deal.get('cooNumber')}",
+                ),
+                ("PRN and Channel", f"PRN: {deal.get('prnNumber') or 'Pending'} ({deal.get('channel')})"),
+                ("Compliance Status", f"{deal.get('amlStatus')} | Non-Custodial Licensed Settlement"),
+                ("Clearing Audit Reference", str(deal.get("xrplLockHash"))),
+            ]
+        elif inv:
+            rows += [
+                ("EFRIS FDN", str(inv.get("efrisFdn"))),
+                ("Buyer", str(inv.get("buyerName"))),
+                ("Amount", f"${inv.get('amountUsd')} = {inv.get('localAmount')} {inv.get('currency')}"),
+                ("Clearing Audit Reference", str(inv.get("xrplHash"))),
+            ]
+        elif bch:
+            rows += [
+                ("Agency and Permit", f"{bch.get('agency')} - {bch.get('permitNo')}"),
+                ("Batch and Product", f"{bch.get('batchCode')} - {bch.get('productName')}"),
+                ("Clearing Audit Reference", str(bch.get("xrplHash"))),
+            ]
+        else:
+            led = [r for r in db.get("taxLedger", []) if r.get("countryCode") == s.get("countryCode")]
+            tot = sum(float(r.get("localAmount", 0)) for r in led)
+            rows += [
+                ("Verified Entries", str(len(led))),
+                ("Audited Turnover", f"{tot:,.2f} {s.get('currency')} (Bank SME Credit Eligible)"),
+            ]
+
+        tr_html = "".join([f"<tr><th>{k}</th><td>{v}</td></tr>" for k, v in rows])
+        verify_url = f"{APP_URL}/api/docs/{doc_type}/{ref_id}"
+
+        qr = qrcode.QRCode(version=1, box_size=10, border=2)
+        qr.add_data(verify_url)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        qr_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+        qr_data_uri = f"data:image/png;base64,{qr_base64}"
+
+        logo_url = f"{APP_URL}/static/logo.png"
+
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>{title}</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; padding: 32px; color: #0f172a; position: relative; }}
+                .watermark {{ position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.08; z-index: -1; pointer-events: none; width: 60%; max-width: 600px; }}
+                table {{ width: 100%; border-collapse: collapse; margin-top: 16px; position: relative; z-index: 1; background: rgba(255,255,255,0.8); }}
+                th, td {{ border: 1px solid #cbd5e1; padding: 10px; text-align: left; }}
+                th {{ background: #f1f5f9; width: 230px; }}
+                .hdr {{ display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #059669; padding-bottom: 12px; position: relative; z-index: 1; }}
+                .qr {{ text-align: center; font-size: 11px; font-weight: bold; }}
+                .qr img {{ border: 2px solid #059669; padding: 4px; background: #fff; border-radius: 6px; }}
+                @media print {{ button {{ display: none; }} .watermark {{ opacity: 0.1; position: absolute; }} body {{ background: white; }} table {{ background: transparent; }} }}
+            </style>
+        </head>
+        <body>
+            <img src="{logo_url}" class="watermark" alt="Watermark" />
+            <div class="hdr">
+                <div>
+                    <h1 style="margin:0;color:#059669">CREST VAULT AFRICA</h1>
+                    <div>Official Agency-Standard Trade and Compliance Record</div>
+                    <div style="font-size:10px;color:#475569;margin-top:4px;">AUTOMATED CLEARING &amp; AUDIT RECORD</div>
+                </div>
+                <div class="qr">
+                    <img src="{qr_data_uri}" width="100" height="100" alt="Scan to Verify"/><br/>
+                    Scan to Verify
+                </div>
+            </div>
+            <h2 style="position: relative; z-index: 1;">{title}</h2>
+            <table>{tr_html}</table>
+            <p style="margin-top:18px;font-size:12px;color:#475569;position:relative;z-index:1;">Verify URL: {verify_url}</p>
+            <p style="font-size:12px;color:#475569;position:relative;z-index:1;"><strong>Audit Proof:</strong> Cryptographically timestamped trade settlement record.</p>
+            <button onclick="window.print()" style="padding:10px 18px;background:#059669;color:#fff;border:none;border-radius:6px;font-weight:bold;cursor:pointer;position:relative;z-index:1;">Print / Save Official PDF</button>
+        </body>
+        </html>
+        """
+        return html_content
+    except Exception as exc:
+        return HTMLResponse(f"<pre>Doc Error: {exc}</pre>", status_code=200)
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=PORT, reload=True)
