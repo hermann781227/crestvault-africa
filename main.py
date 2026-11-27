@@ -830,6 +830,7 @@ def create_deal(req: DealCreateReq, s: dict = Depends(get_session)):
     aml_result = screen_entity_for_aml(req.supplierName, req.supplierAccountNumber, req.countryCode)
     if not aml_result["cleared"]:
         raise HTTPException(status_code=403, detail=f"Compliance Block: {aml_result['reason']}")
+   
     db = load_db()
     code = s["countryCode"]
     prof = APPROVED_COUNTRIES[code]
