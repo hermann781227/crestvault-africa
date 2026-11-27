@@ -619,7 +619,10 @@ async def run_triple_rail_settlement_suite() -> Dict[str, Any]:
     }
 
 
+
 _CACHED_SANDBOX_ACTORS: Dict[str, Any] = {}
+
+_WARMUP_LOCK = threading.Lock()
 
 
 async def get_or_init_sandbox_actors(client: AsyncJsonRpcClient, currency_code: str) -> Dict[str, Any]:
@@ -648,6 +651,24 @@ async def get_or_init_sandbox_actors(client: AsyncJsonRpcClient, currency_code: 
     return actors
 
 
+def _background_warmup_xrpl() -> None:
+    """Warms up Testnet RLUSD & USDC actors on server boot so user deals settle in 4 seconds."""
+    with _WARMUP_LOCK:
+        for sym in ("RLUSD", "USDC"):
+            code = XRPL_STABLECOINS[sym]["currency_code"]
+            if code not in _CACHED_SANDBOX_ACTORS:
+                try:
+                    asyncio.run(get_or_init_sandbox_actors(AsyncJsonRpcClient(XRPL_TESTNET_URL), code))
+                    print(f"[XRPL Warmup] {sym} flag-enabled actors ready.")
+                except Exception as exc:
+                    print(f"[XRPL Warmup] {sym} deferred: {exc}")
+
+
+@app.on_event("startup")
+def start_xrpl_warmup_thread() -> None:
+    threading.Thread(target=_background_warmup_xrpl, daemon=True).start()
+
+
 def execute_deal_settlement_fast(
     deal_id: str,
     symbol: str,
@@ -655,7 +676,7 @@ def execute_deal_settlement_fast(
     supplier_bank: str,
     supplier_acct: str,
 ) -> Dict[str, Any]:
-    """Executes a real on-chain XRPL EscrowCreate in ~4 seconds with zero fake hash fallbacks."""
+    """Executes a real on-chain XRPL EscrowCreate in ~4 seconds."""
     token = XRPL_STABLECOINS.get(symbol.upper(), XRPL_STABLECOINS["RLUSD"])
     memo = build_offramp_routing_memo(deal_id, supplier_bank, supplier_acct, "CNY")
 
@@ -694,7 +715,7 @@ def execute_deal_settlement_fast(
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         future = executor.submit(asyncio.run, _run())
-        return future.result(timeout=45.0)
+        return future.result(timeout=60.0)
 
 
 def finish_deal_settlement_fast(deal: Dict[str, Any]) -> str:
