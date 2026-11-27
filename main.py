@@ -21,7 +21,6 @@ from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-# XRPL IMPORTS
 from xrpl.asyncio.clients import AsyncJsonRpcClient
 from xrpl.asyncio.transaction import autofill as async_autofill
 from xrpl.asyncio.transaction import multisign as async_multisign
@@ -57,7 +56,6 @@ CORPORATE_FEE_WALLET = os.getenv("CORPORATE_FEE_WALLET", "rCrestVaultAfricaCorpo
 OFFRAMP_HOLDING_ADDRESS = os.getenv("OFFRAMP_HOLDING_ADDRESS", "")
 DB_FILE = "crestvault_v2_db.json"
 
-# XRPL NETWORK & PROTOCOL CONSTANTS
 XRPL_TESTNET_URL = os.getenv("XRPL_RPC_URL", "https://rippletest.net")
 LSF_REQUIRE_AUTH = 0x00040000
 LSF_ALLOW_TRUSTLINE_LOCKING = 0x40000000
@@ -82,14 +80,13 @@ def encode_hex(text: str) -> str:
     return binascii.hexlify(text.encode("utf-8")).decode("utf-8").upper()
 
 
-# --- MULTI-STABLECOIN ISSUER REGISTRY (XRPL-NATIVE) ---
 XRPL_STABLECOINS: Dict[str, Dict[str, Any]] = {
     "RLUSD": {
         "name": "Ripple USD",
         "fiat": "USD",
         "currency_code": to_xrpl_currency_code("RLUSD"),
         "mainnet_issuer": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
-        "testnet_issuer": None,  # Uses live Flag-17 issuer provisioning on Testnet
+        "testnet_issuer": None,
     },
     "USDC": {
         "name": "Circle USD Coin",
@@ -128,7 +125,6 @@ XRPL_STABLECOINS: Dict[str, Dict[str, Any]] = {
     },
 }
 
-# --- CONSTANTS & DATA ---
 INCOTERMS = {
     "EXW": "Ex Works (Factory Gate)",
     "FOB": "Free On Board (Origin Port)",
@@ -193,7 +189,6 @@ DEFAULT_SOCKETS = {
 SANCTIONED_ENTITIES = ["OFAC-12345", "IRAN-OIL-CORP", "NORTH-KOREA-TRADE", "SANCTIONED BANK"]
 
 
-# --- MODELS ---
 class SignupReq(BaseModel):
     countryCode: str
     userRole: str
@@ -272,13 +267,12 @@ class AdminConfigReq(BaseModel):
     sockets: dict
 
 
-# --- HELPERS ---
-def sha256_hex(data):
+def sha256_hex(data: Any) -> str:
     return hashlib.sha256(json.dumps(data, sort_keys=True).encode("utf-8")).hexdigest().upper()
 
 
-def load_db():
-    base = {
+def load_db() -> Dict[str, Any]:
+    base: Dict[str, Any] = {
         "wallets": {},
         "sessions": {},
         "invoices": [],
@@ -301,13 +295,13 @@ def load_db():
     return base
 
 
-def save_db(data):
+def save_db(data: Dict[str, Any]) -> None:
     with _db_io_lock:
         with open(DB_FILE, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
 
 
-def record_fee(db, ftype, ref_id, usd, xhash):
+def record_fee(db: Dict[str, Any], ftype: str, ref_id: str, usd: float, xhash: str) -> None:
     db["corporateRevenue"].append(
         {
             "id": f"FEE-{str(int(time.time()*1000))[-5:]}",
@@ -315,3 +309,8 @@ def record_fee(db, ftype, ref_id, usd, xhash):
             "feeType": ftype,
             "referenceId": ref_id,
             "amountUsd": round(usd, 2),
+            "xrplHash": xhash,
+        }
+    )
+
+
