@@ -621,14 +621,24 @@ async def run_triple_rail_settlement_suite() -> Dict[str, Any]:
 
 
 _CACHED_SANDBOX_ACTORS: Dict[str, Any] = {}
-
 _WARMUP_LOCK = threading.Lock()
 
 
 async def get_or_init_sandbox_actors(client: AsyncJsonRpcClient, currency_code: str) -> Dict[str, Any]:
-    """Provisions and funds Issuer, Buyer, and Off-Ramp Partner once so every deal settles in ~4 seconds."""
+    """Provisions and caches Issuer, Buyer, and Off-Ramp Partner wallets in DB so deals settle in ~4s."""
     if currency_code in _CACHED_SANDBOX_ACTORS:
         return _CACHED_SANDBOX_ACTORS[currency_code]
+
+    db = load_db()
+    saved = db.get("wallets", {}).get(currency_code)
+    if saved and saved.get("buyer_seed") and saved.get("offramp_seed") and saved.get("issuer_address"):
+        actors = {
+            "buyer": Wallet.from_seed(saved["buyer_seed"]),
+            "offramp_partner": Wallet.from_seed(saved["offramp_seed"]),
+            "issuer_address": saved["issuer_address"],
+        }
+        _CACHED_SANDBOX_ACTORS[currency_code] = actors
+        return actors
 
     buyer, offramp_partner = await asyncio.gather(
         generate_faucet_wallet(client, debug=False),
@@ -640,7 +650,7 @@ async def get_or_init_sandbox_actors(client: AsyncJsonRpcClient, currency_code: 
         buyer=buyer,
         offramp_partner=offramp_partner,
         enable_locking_flag=True,
-        mint_amount="1000000",
+        mint_amount="10000000",
     )
     actors = {
         "buyer": buyer,
@@ -648,18 +658,24 @@ async def get_or_init_sandbox_actors(client: AsyncJsonRpcClient, currency_code: 
         "issuer_address": issued["issuer_address"],
     }
     _CACHED_SANDBOX_ACTORS[currency_code] = actors
+
+    db.setdefault("wallets", {})[currency_code] = {
+        "buyer_seed": buyer.seed,
+        "offramp_seed": offramp_partner.seed,
+        "issuer_address": issued["issuer_address"],
+    }
+    save_db(db)
     return actors
 
 
 def _background_warmup_xrpl() -> None:
-    """Warms up Testnet RLUSD & USDC actors on server boot so user deals settle in 4 seconds."""
     with _WARMUP_LOCK:
         for sym in ("RLUSD", "USDC"):
             code = XRPL_STABLECOINS[sym]["currency_code"]
             if code not in _CACHED_SANDBOX_ACTORS:
                 try:
                     asyncio.run(get_or_init_sandbox_actors(AsyncJsonRpcClient(XRPL_TESTNET_URL), code))
-                    print(f"[XRPL Warmup] {sym} flag-enabled actors ready.")
+                    print(f"[XRPL Warmup] {sym} actors ready.")
                 except Exception as exc:
                     print(f"[XRPL Warmup] {sym} deferred: {exc}")
 
@@ -676,7 +692,7 @@ def execute_deal_settlement_fast(
     supplier_bank: str,
     supplier_acct: str,
 ) -> Dict[str, Any]:
-    """Executes a real on-chain XRPL EscrowCreate in ~4 seconds."""
+    """Executes a real on-chain XRPL EscrowCreate in ~4 seconds with clean error handling."""
     token = XRPL_STABLECOINS.get(symbol.upper(), XRPL_STABLECOINS["RLUSD"])
     memo = build_offramp_routing_memo(deal_id, supplier_bank, supplier_acct, "CNY")
 
@@ -715,7 +731,10 @@ def execute_deal_settlement_fast(
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         future = executor.submit(asyncio.run, _run())
-        return future.result(timeout=60.0)
+        try:
+            return future.result(timeout=60.0)
+        except Exception as exc:
+            raise HTTPException(status_code=503, detail=f"Settlement network busy, retry in 5s: {exc}")
 
 
 def finish_deal_settlement_fast(deal: Dict[str, Any]) -> str:
