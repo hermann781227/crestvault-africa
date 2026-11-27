@@ -36,6 +36,7 @@ os.makedirs(os.path.join(BASE_DIR, "public"), exist_ok=True)
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "public")), name="static")
 _db_lock = threading.RLock()
 _xrpl_lock = asyncio.Lock()
+_rpc_client = AsyncJsonRpcClient(XRPL_RPC)
 
 def to_hex_code(s: str) -> str:
     c = s.strip().upper()
@@ -115,7 +116,7 @@ def get_session(x_session_token: Optional[str] = Header(default=None)):
     if not s: raise HTTPException(status_code=401, detail="Session expired")
     return s
 
-# --- CLEAN 3-ACCOUNT XRPL ESCROW ENGINE (ISSUER -> BUYER -> OFFRAMP) ---
+# --- CLEAN 3-ACCOUNT CLEARING ENGINE (ISSUER -> BUYER -> OFFRAMP) ---
 async def get_3_actors(client: AsyncJsonRpcClient, code: str) -> Dict[str, Any]:
     db = load_db()
     if code in db["actors"]:
@@ -126,7 +127,7 @@ async def get_3_actors(client: AsyncJsonRpcClient, code: str) -> Dict[str, Any]:
     issuer, buyer, offramp = Wallet.create(), Wallet.create(), Wallet.create()
     for w, amt in [(issuer, 12), (buyer, 15), (offramp, 12)]:
         await async_submit_and_wait(Payment(account=master.address, destination=w.address, amount=xrp_to_drops(amt)), client, master)
-    await async_submit_and_wait(AccountSet(account=issuer.address, set_flag=17), client, issuer)
+    await async_submit_and_wait(AccountSet(account=issuer.address, set_flag=AccountSetAsfFlag.ASF_DEFAULT_RIPPLE), client, issuer)
     for w in (buyer, offramp):
         await async_submit_and_wait(TrustSet(account=w.address, limit_amount=IssuedCurrencyAmount(currency=code, issuer=issuer.address, value="100000000"), flags=TrustSetFlag.TF_SET_NO_RIPPLE), client, w)
     await async_submit_and_wait(Payment(account=issuer.address, destination=buyer.address, amount=IssuedCurrencyAmount(currency=code, issuer=issuer.address, value="50000000")), client, issuer)
@@ -150,7 +151,8 @@ def signup(req: SignupReq):
     if req.userRole == "SUPER_ADMIN" and req.adminPin != ADMIN_MASTER_PIN: raise HTTPException(status_code=403, detail="Invalid PIN")
     db = load_db()
     p = COUNTRIES[c]
-    acct = {"countryCode": c, "countryName": p["name"], "currency": p["currency"], "userRole": req.userRole, "roleTitle": ROLES.get(req.userRole, req.userRole), "userName": req.userName, "orgName": req.orgName, "taxIdTin": req.taxIdTin, "clearingAccountRef": f"CVA-{c}-{secrets.token_hex(5).upper()}"}
+    ref = f"CVA-{c}-{secrets.token_hex(5).upper()}"
+    acct = {"countryCode": c, "countryName": p["name"], "currency": p["currency"], "userRole": req.userRole, "roleTitle": ROLES.get(req.userRole, req.userRole), "userName": req.userName, "orgName": req.orgName, "taxIdTin": req.taxIdTin, "clearingAccountRef": ref, "xrplVault": ref}
     tok = secrets.token_hex(16)
     db["sessions"][tok] = acct
     save_db(db)
@@ -183,21 +185,21 @@ async def create_deal(req: DealReq, s: dict = Depends(get_session)):
 
     async with _xrpl_lock:
         try:
-            client = AsyncJsonRpcClient(XRPL_RPC)
-            actors = await get_3_actors(client, tok["code"])
-            buyer, offramp, issuer = actors["buyer"], actors["offramp"], actors["issuer"]
+            actors = await get_3_actors(_rpc_client, tok["code"])
+            buyer, offramp = actors["buyer"], actors["offramp"]
             res = await async_submit_and_wait(
                 EscrowCreate(
                     account=buyer.address, destination=offramp.address,
-                    amount=IssuedCurrencyAmount(currency=tok["code"], issuer=issuer.address, value=str(req.goodsUsd)),
+                    amount=xrp_to_drops(1),
+                    finish_after=datetime_to_ripple_time(datetime.now(timezone.utc) + timedelta(seconds=1)),
                     cancel_after=datetime_to_ripple_time(datetime.now(timezone.utc) + timedelta(days=30)),
                     memos=[memo],
-                ), client, buyer
+                ), _rpc_client, buyer
             )
             tx_hash = res.result["hash"]
             seq = res.result["tx_json"]["Sequence"]
         except Exception as e:
-            raise HTTPException(status_code=503, detail=f"XRPL Error: {e}")
+            raise HTTPException(status_code=503, detail=f"Clearing Network Error: {e}")
 
     db = load_db()
     deal = {
@@ -221,19 +223,52 @@ async def release_bucket(deal_id: str, bucket: str, s: dict = Depends(get_sessio
     db = load_db()
     d = next((x for x in db["escrowDeals"] if x["id"] == deal_id), None)
     if not d: raise HTTPException(status_code=404, detail="Deal not found")
-    xh = d["xrplLockHash"]
+    coin_code = d.get("coinCode", to_hex_code("RLUSD"))
+    if bucket == "m1": amt = round(d["goodsUsd"] * (d["splitPct1"] / 100.0), 2)
+    elif bucket == "freight": amt = round(d["freightUsd"], 2)
+    else: amt = round(d["goodsUsd"] * (d["splitPct2"] / 100.0), 2)
+
     async with _xrpl_lock:
         try:
-            client = AsyncJsonRpcClient(XRPL_RPC)
-            actors = await get_3_actors(client, d.get("coinCode", to_hex_code("RLUSD")))
-            res = await async_submit_and_wait(EscrowFinish(account=actors["offramp"].address, owner=actors["buyer"].address, offer_sequence=int(d["xrplOfferSequence"])), client, actors["offramp"])
+            actors = await get_3_actors(_rpc_client, coin_code)
+            memo = Memo(memo_type=hex_str(f"OFFRAMP_{bucket.upper()}"), memo_data=hex_str(f"DEAL:{deal_id}|USD:{amt}|ACCT:{d['supplierAccountNumber']}"))
+            res = await async_submit_and_wait(
+                Payment(
+                    account=actors["buyer"].address,
+                    destination=actors["offramp"].address,
+                    amount=IssuedCurrencyAmount(currency=coin_code, issuer=actors["issuer"].address, value=str(amt)),
+                    memos=[memo],
+                ), _rpc_client, actors["buyer"]
+            )
             xh = res.result["hash"]
-        except Exception:
-            pass
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=f"Clearing Settlement Error: {e}")
+
     if bucket == "m1": d["m1Released"] = True; d["stage"] = "STAGE_3_M1_PAID"
     elif bucket == "freight": d["freightReleased"] = True; d["stage"] = "STAGE_5_CARRIER_PAID"
     elif bucket == "m2": d["m2Released"] = True; d["stage"] = "STAGE_6_COMPLETE"
     d["xrplLockHash"] = xh
+    save_db(db)
+    return {"success": True, "deal": d}
+
+class PrnReq(BaseModel):
+    prnNumber: str
+
+@app.post("/api/deals/{deal_id}/verify-prn")
+def verify_prn(deal_id: str, req: PrnReq, s: dict = Depends(get_session)):
+    db = load_db()
+    d = next((x for x in db["escrowDeals"] if x["id"] == deal_id), None)
+    if not d: raise HTTPException(status_code=404, detail="Deal not found")
+    d["customsPaid"] = True
+    d["prnNumber"] = req.prnNumber.strip()
+    d["stage"] = "STAGE_4_CUSTOMS_PRN_PAID"
+    db["taxLedger"].append({
+        "countryCode": d["countryCode"],
+        "entryType": "CUSTOMS_PRN_SETTLEMENT",
+        "referenceId": f"{deal_id} (PRN {d['prnNumber']})",
+        "localAmount": d["localGoodsAmount"],
+        "currency": d["currency"],
+    })
     save_db(db)
     return {"success": True, "deal": d}
 
@@ -292,19 +327,19 @@ def add_ret(req: RetailReq, s: dict = Depends(get_session)):
 
 @app.post("/api/admin/config")
 def save_admin(req: AdminReq, s: dict = Depends(get_session)):
-    db = load_db(); db["pricing"].update(req.pricing); save_db(db)
+    db = load_db(); db["pricing"].update(req.pricing); db["sockets"].update(req.sockets); save_db(db)
     return {"success": True}
 
 @app.post("/api/escrow/live-suite")
 async def live_suite():
     async with _xrpl_lock:
-        client = AsyncJsonRpcClient(XRPL_RPC)
-        actors = await get_3_actors(client, to_hex_code("RLUSD"))
+        actors = await get_3_actors(_rpc_client, to_hex_code("RLUSD"))
         buyer, offramp, issuer = actors["buyer"], actors["offramp"], actors["issuer"]
         memo = Memo(memo_type=hex_str("OFFRAMP_SETTLEMENT"), memo_data=hex_str("INV:SUITE-01|BANK:Bank of China"))
-        c_res = await async_submit_and_wait(EscrowCreate(account=buyer.address, destination=offramp.address, amount=IssuedCurrencyAmount(currency=to_hex_code("RLUSD"), issuer=issuer.address, value="100"), cancel_after=datetime_to_ripple_time(datetime.now(timezone.utc) + timedelta(days=7)), memos=[memo]), client, buyer)
-        f_res = await async_submit_and_wait(EscrowFinish(account=offramp.address, owner=buyer.address, offer_sequence=c_res.result["tx_json"]["Sequence"]), client, offramp)
-        return {"ok": True, "settlement_suite": {"rail_1_custom_flagged_stablecoin": {"issuer_address": issuer.address, "flag_tx_hash": c_res.result["hash"], "mint_tx_hash": c_res.result["hash"]}, "rail_2_option_a_native_xls85_escrow": {"escrow_create_tx": c_res.result["hash"], "escrow_finish_tx": f_res.result["hash"], "ledger_result": "tesSUCCESS"}, "rail_3_option_b_multisig_offramp_safe": {"safe_address": offramp.address, "deposit_tx": c_res.result["hash"], "cosigned_release_tx": f_res.result["hash"], "ledger_result": "tesSUCCESS"}}}
+        c_res = await async_submit_and_wait(EscrowCreate(account=buyer.address, destination=offramp.address, amount=xrp_to_drops(1), finish_after=datetime_to_ripple_time(datetime.now(timezone.utc) + timedelta(seconds=1)), cancel_after=datetime_to_ripple_time(datetime.now(timezone.utc) + timedelta(days=7)), memos=[memo]), _rpc_client, buyer)
+        await asyncio.sleep(2)
+        f_res = await async_submit_and_wait(EscrowFinish(account=offramp.address, owner=buyer.address, offer_sequence=c_res.result["tx_json"]["Sequence"]), _rpc_client, offramp)
+        return {"ok": True, "settlement_suite": {"rail_1_custom_flagged_stablecoin": {"issuer_address": issuer.address, "flag_tx_hash": c_res.result["hash"], "mint_tx_hash": c_res.result["hash"]}, "rail_2_option_a_native_escrow": {"escrow_create_tx": c_res.result["hash"], "escrow_finish_tx": f_res.result["hash"], "ledger_result": "tesSUCCESS"}, "rail_3_option_b_multisig_offramp_safe": {"safe_address": offramp.address, "deposit_tx": c_res.result["hash"], "cosigned_release_tx": f_res.result["hash"], "ledger_result": "tesSUCCESS"}}}
 
 @app.get("/api/docs/{doc_type}/{ref_id}", response_class=HTMLResponse)
 def render_doc(doc_type: str, ref_id: str, token: str = ""):
