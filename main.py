@@ -313,7 +313,7 @@ def get_session(x_session_token: Optional[str] = Header(default=None)) -> Dict[s
         raise HTTPException(status_code=401, detail="Session expired")
     return s
 
-
+```python
 def sign_multisig_leg(tx_dict: Dict[str, Any], signer: Wallet) -> Payment:
     sig_hex = encode_for_multisigning(tx_dict, signer.address)
     sig = kp_sign(bytes.fromhex(sig_hex), signer.private_key)
