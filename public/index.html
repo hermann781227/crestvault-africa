@@ -202,3 +202,615 @@
           <label>Incoterm</label>
           <select id="deal-incoterm">
             <option value="FOB">FOB (Free On Board — 30/70)</option>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crest Vault Africa — Sovereign Cross-Border Trade &amp; Compliance OS</title>
+  <style>
+    :root {
+      --bg: #07111e;
+      --card: #0f1e33;
+      --card-alt: #152842;
+      --border: #233b5c;
+      --gold: #eab308;
+      --emerald: #10b981;
+      --sky: #38bdf8;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .container { max-width: 1180px; margin: 0 auto; padding: 20px; }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px; padding: 18px 24px;
+      background: linear-gradient(135deg, #0b192c, #112642);
+      border-bottom: 2px solid var(--gold);
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand img { width: 54px; height: 54px; border-radius: 10px; object-fit: cover; border: 1px solid var(--gold); }
+    .brand h1 { margin: 0; font-size: 1.4rem; color: var(--gold); letter-spacing: 0.02em; }
+    .brand p { margin: 2px 0 0 0; font-size: 0.85rem; color: var(--muted); }
+    .badge {
+      display: inline-block; padding: 4px 10px; border-radius: 999px;
+      font-size: 0.75rem; font-weight: 700; background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; margin-top: 20px; }
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px; margin-bottom: 20px;
+    }
+    .card h2 { margin: 0 0 12px 0; font-size: 1.15rem; color: var(--gold); }
+    label { display: block; font-size: 0.82rem; color: var(--muted); margin: 10px 0 4px 0; font-weight: 600; }
+    input, select {
+      width: 100%; padding: 10px 12px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--card-alt);
+      color: var(--text); font-size: 0.92rem;
+    }
+    button {
+      margin-top: 14px; padding: 11px 16px; border: none; border-radius: 8px;
+      background: var(--emerald); color: #042f2e; font-weight: 700;
+      cursor: pointer; font-size: 0.92rem; width: 100%;
+    }
+    button.secondary { background: var(--sky); color: #082f49; }
+    button.gold { background: var(--gold); color: #1c1917; }
+    button.danger { background: var(--danger); color: #fff; width: auto; padding: 8px 14px; margin-top: 0; }
+    button.sm { width: auto; padding: 6px 12px; margin: 4px 4px 0 0; font-size: 0.8rem; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+    .tab-btn {
+      width: auto; margin: 0; background: var(--card-alt); color: var(--text);
+      border: 1px solid var(--border); padding: 9px 14px; font-size: 0.85rem;
+    }
+    .tab-btn.active { background: var(--gold); color: #111827; border-color: var(--gold); }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .topbar {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 12px; background: var(--card-alt); padding: 14px 18px;
+      border-radius: 10px; border: 1px solid var(--border);
+    }
+    .item-box {
+      background: var(--card-alt); border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px; margin-top: 12px; font-size: 0.88rem;
+    }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; color: var(--sky); word-break: break-all; }
+    .alert { padding: 10px 14px; border-radius: 8px; margin-top: 12px; font-size: 0.88rem; }
+    .alert.ok { background: rgba(16, 185, 129, 0.15); border: 1px solid var(--emerald); color: #6ee7b7; }
+    .alert.err { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: #fca5a5; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="/static/logo.png" alt="Crest Vault Africa" onerror="this.style.display='none'" />
+      <div>
+        <h1>CREST VAULT AFRICA</h1>
+        <p>Non-Custodial Sovereign Trade OS • 7-Role Ecosystem • Agency Printable Vault</p>
+      </div>
+    </div>
+    <div>
+      <span class="badge">Direct Bank &amp; Mobile Money Settlement • Zero Custody</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- AUTH & PUBLIC SCANNER VIEW -->
+    <div id="auth-view" class="grid-2">
+      <div class="card">
+        <h2>1. Create Business / Agency / Owner Account</h2>
+        <label>Jurisdiction</label>
+        <select id="signup-country">
+          <option value="UG">Uganda - URA and UNBS/NDA (UGX)</option>
+          <option value="KE">Kenya - KRA and KEBS (KES)</option>
+          <option value="NG">Nigeria - FIRS and SON/NAFDAC (NGN)</option>
+          <option value="ZA">South Africa - SARS and SABS (ZAR)</option>
+          <option value="RW">Rwanda - RRA and RSB (RWF)</option>
+          <option value="GH">Ghana - GRA and GSA (GHS)</option>
+          <option value="AE">UAE - FTA and ESMA (AED)</option>
+          <option value="LY">Libya (OFAC Sanctions Test)</option>
+        </select>
+
+        <label>Account Role (All 7 Roles + Level 6 Owner)</label>
+        <select id="signup-role">
+          <option value="IMPORTER">Importer / Kikuubo Trader</option>
+          <option value="EXPORTER">Factory / Agro-Exporter</option>
+          <option value="CARRIER">Freight Carrier / Fleet Owner</option>
+          <option value="WHOLESALER">Wholesaler / Distributor</option>
+          <option value="RETAILER">Retail Shop / Pharmacy</option>
+          <option value="AUDITOR">External CPA / Tax Accountant</option>
+          <option value="REGULATOR">Government Inspector (URA / UNBS / NDA)</option>
+          <option value="SUPER_ADMIN">Level 6 Platform Owner / Super-Admin</option>
+        </select>
+
+        <label>Full Name</label>
+        <input id="signup-name" placeholder="e.g., Sarah Namukasa" />
+
+        <label>URA / National TIN (or Truck Plate for Carriers)</label>
+        <input id="signup-tin" placeholder="e.g., 1004928172" />
+
+        <label>Company / Agency Name</label>
+        <input id="signup-org" placeholder="e.g., Kampala Solar &amp; Hardware Ltd" />
+
+        <label>Subscription Plan</label>
+        <select id="signup-plan">
+          <option value="PRO_TRADE">Pro Trade ($49/mo)</option>
+          <option value="FREE_STARTER">Free Starter ($0/mo)</option>
+          <option value="RETAIL_PRO">Retail Pro ($15/mo)</option>
+          <option value="FACTORY_ENTERPRISE">Factory Enterprise ($199/mo)</option>
+        </select>
+
+        <label>UNBS / NDA / Fleet Permit (Optional)</label>
+        <input id="signup-permit" placeholder="e.g., UNBS-Q-88412" />
+
+        <label>Super-Admin PIN (Level 6 Owner Only)</label>
+        <input id="signup-pin" type="password" placeholder="Leave blank unless Owner" />
+
+        <button onclick="handleSignup()">Provision Trade Clearing Account &amp; Enter Workspace</button>
+        <div id="signup-msg"></div>
+      </div>
+
+      <div class="card">
+        <h2>2. Public Product Authenticity Scanner (Level 1)</h2>
+        <p style="font-size:0.88rem;color:var(--muted);">Verify UNBS / NDA / SON / KEBS serialized batch codes in real time and detect counterfeit clones across cities.</p>
+        <label>Product Serial Code</label>
+        <input id="scan-serial" placeholder="e.g., BCH-2026-0001" />
+        <label>District / Scan Location</label>
+        <input id="scan-city" value="Kampala" />
+        <button class="secondary" onclick="verifySerial()">Verify Serial Authenticity</button>
+        <div id="scan-result"></div>
+      </div>
+    </div>
+
+    <!-- WORKSPACE VIEW -->
+    <div id="workspace-view" style="display:none;">
+      <div class="topbar">
+        <div>
+          <strong id="ws-org" style="font-size:1.05rem;color:var(--gold);">Workspace</strong>
+          <span class="badge" id="ws-role" style="margin-left:8px;">Role</span>
+          <div style="font-size:0.82rem;color:var(--muted);margin-top:4px;">
+            Clearing Ref: <span class="mono" id="ws-vault">Ready</span> •
+            Rate: <strong id="ws-fx">1 USD = 3,700 UGX</strong>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="sm secondary" onclick="openDoc('bank-credit-passport', 'SUMMARY')">Bank Credit Passport</button>
+          <button class="sm gold" onclick="openDoc('ura-tax-ledger', 'LEDGER')">Tax Ledger</button>
+          <button class="danger" onclick="logout()">Lock &amp; Exit</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tab-escrow', this)">1. Incoterms &amp; Split Escrow</button>
+        <button class="tab-btn" onclick="switchTab('tab-freight', this)">2. Freight Bidding</button>
+        <button class="tab-btn" onclick="switchTab('tab-efris', this)">3. EFRIS Invoices</button>
+        <button class="tab-btn" onclick="switchTab('tab-batch', this)">4. QR Batch Seal</button>
+        <button class="tab-btn" onclick="switchTab('tab-retail', this)">5. Retail POS &amp; 14d Credit</button>
+        <button class="tab-btn" onclick="switchTab('tab-docs', this)">6. All 8 Agency Docs</button>
+        <button class="tab-btn" onclick="switchTab('tab-owner', this)">7. Level 6 Owner &amp; Clearing Engine</button>
+      </div>
+
+      <!-- TAB 1: INCOTERMS ESCROW -->
+      <div id="tab-escrow" class="panel active grid-2">
+        <div class="card">
+          <h2>Lock Negotiable Incoterm 3-Bucket Escrow</h2>
+          <label>Incoterm</label>
+          <select id="deal-incoterm">
+            <option value="FOB">FOB (Free On Board — 30/70)</option>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crest Vault Africa — Sovereign Cross-Border Trade &amp; Compliance OS</title>
+  <style>
+    :root {
+      --bg: #07111e;
+      --card: #0f1e33;
+      --card-alt: #152842;
+      --border: #233b5c;
+      --gold: #eab308;
+      --emerald: #10b981;
+      --sky: #38bdf8;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .container { max-width: 1180px; margin: 0 auto; padding: 20px; }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px; padding: 18px 24px;
+      background: linear-gradient(135deg, #0b192c, #112642);
+      border-bottom: 2px solid var(--gold);
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand img { width: 54px; height: 54px; border-radius: 10px; object-fit: cover; border: 1px solid var(--gold); }
+    .brand h1 { margin: 0; font-size: 1.4rem; color: var(--gold); letter-spacing: 0.02em; }
+    .brand p { margin: 2px 0 0 0; font-size: 0.85rem; color: var(--muted); }
+    .badge {
+      display: inline-block; padding: 4px 10px; border-radius: 999px;
+      font-size: 0.75rem; font-weight: 700; background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; margin-top: 20px; }
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px; margin-bottom: 20px;
+    }
+    .card h2 { margin: 0 0 12px 0; font-size: 1.15rem; color: var(--gold); }
+    label { display: block; font-size: 0.82rem; color: var(--muted); margin: 10px 0 4px 0; font-weight: 600; }
+    input, select {
+      width: 100%; padding: 10px 12px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--card-alt);
+      color: var(--text); font-size: 0.92rem;
+    }
+    button {
+      margin-top: 14px; padding: 11px 16px; border: none; border-radius: 8px;
+      background: var(--emerald); color: #042f2e; font-weight: 700;
+      cursor: pointer; font-size: 0.92rem; width: 100%;
+    }
+    button.secondary { background: var(--sky); color: #082f49; }
+    button.gold { background: var(--gold); color: #1c1917; }
+    button.danger { background: var(--danger); color: #fff; width: auto; padding: 8px 14px; margin-top: 0; }
+    button.sm { width: auto; padding: 6px 12px; margin: 4px 4px 0 0; font-size: 0.8rem; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+    .tab-btn {
+      width: auto; margin: 0; background: var(--card-alt); color: var(--text);
+      border: 1px solid var(--border); padding: 9px 14px; font-size: 0.85rem;
+    }
+    .tab-btn.active { background: var(--gold); color: #111827; border-color: var(--gold); }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .topbar {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 12px; background: var(--card-alt); padding: 14px 18px;
+      border-radius: 10px; border: 1px solid var(--border);
+    }
+    .item-box {
+      background: var(--card-alt); border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px; margin-top: 12px; font-size: 0.88rem;
+    }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; color: var(--sky); word-break: break-all; }
+    .alert { padding: 10px 14px; border-radius: 8px; margin-top: 12px; font-size: 0.88rem; }
+    .alert.ok { background: rgba(16, 185, 129, 0.15); border: 1px solid var(--emerald); color: #6ee7b7; }
+    .alert.err { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: #fca5a5; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="/static/logo.png" alt="Crest Vault Africa" onerror="this.style.display='none'" />
+      <div>
+        <h1>CREST VAULT AFRICA</h1>
+        <p>Non-Custodial Sovereign Trade OS • 7-Role Ecosystem • Agency Printable Vault</p>
+      </div>
+    </div>
+    <div>
+      <span class="badge">Direct Bank &amp; Mobile Money Settlement • Zero Custody</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- AUTH & PUBLIC SCANNER VIEW -->
+    <div id="auth-view" class="grid-2">
+      <div class="card">
+        <h2>1. Create Business / Agency / Owner Account</h2>
+        <label>Jurisdiction</label>
+        <select id="signup-country">
+          <option value="UG">Uganda - URA and UNBS/NDA (UGX)</option>
+          <option value="KE">Kenya - KRA and KEBS (KES)</option>
+          <option value="NG">Nigeria - FIRS and SON/NAFDAC (NGN)</option>
+          <option value="ZA">South Africa - SARS and SABS (ZAR)</option>
+          <option value="RW">Rwanda - RRA and RSB (RWF)</option>
+          <option value="GH">Ghana - GRA and GSA (GHS)</option>
+          <option value="AE">UAE - FTA and ESMA (AED)</option>
+          <option value="LY">Libya (OFAC Sanctions Test)</option>
+        </select>
+
+        <label>Account Role (All 7 Roles + Level 6 Owner)</label>
+        <select id="signup-role">
+          <option value="IMPORTER">Importer / Kikuubo Trader</option>
+          <option value="EXPORTER">Factory / Agro-Exporter</option>
+          <option value="CARRIER">Freight Carrier / Fleet Owner</option>
+          <option value="WHOLESALER">Wholesaler / Distributor</option>
+          <option value="RETAILER">Retail Shop / Pharmacy</option>
+          <option value="AUDITOR">External CPA / Tax Accountant</option>
+          <option value="REGULATOR">Government Inspector (URA / UNBS / NDA)</option>
+          <option value="SUPER_ADMIN">Level 6 Platform Owner / Super-Admin</option>
+        </select>
+
+        <label>Full Name</label>
+        <input id="signup-name" placeholder="e.g., Sarah Namukasa" />
+
+        <label>URA / National TIN (or Truck Plate for Carriers)</label>
+        <input id="signup-tin" placeholder="e.g., 1004928172" />
+
+        <label>Company / Agency Name</label>
+        <input id="signup-org" placeholder="e.g., Kampala Solar &amp; Hardware Ltd" />
+
+        <label>Subscription Plan</label>
+        <select id="signup-plan">
+          <option value="PRO_TRADE">Pro Trade ($49/mo)</option>
+          <option value="FREE_STARTER">Free Starter ($0/mo)</option>
+          <option value="RETAIL_PRO">Retail Pro ($15/mo)</option>
+          <option value="FACTORY_ENTERPRISE">Factory Enterprise ($199/mo)</option>
+        </select>
+
+        <label>UNBS / NDA / Fleet Permit (Optional)</label>
+        <input id="signup-permit" placeholder="e.g., UNBS-Q-88412" />
+
+        <label>Super-Admin PIN (Level 6 Owner Only)</label>
+        <input id="signup-pin" type="password" placeholder="Leave blank unless Owner" />
+
+        <button onclick="handleSignup()">Provision Trade Clearing Account &amp; Enter Workspace</button>
+        <div id="signup-msg"></div>
+      </div>
+
+      <div class="card">
+        <h2>2. Public Product Authenticity Scanner (Level 1)</h2>
+        <p style="font-size:0.88rem;color:var(--muted);">Verify UNBS / NDA / SON / KEBS serialized batch codes in real time and detect counterfeit clones across cities.</p>
+        <label>Product Serial Code</label>
+        <input id="scan-serial" placeholder="e.g., BCH-2026-0001" />
+        <label>District / Scan Location</label>
+        <input id="scan-city" value="Kampala" />
+        <button class="secondary" onclick="verifySerial()">Verify Serial Authenticity</button>
+        <div id="scan-result"></div>
+      </div>
+    </div>
+
+    <!-- WORKSPACE VIEW -->
+    <div id="workspace-view" style="display:none;">
+      <div class="topbar">
+        <div>
+          <strong id="ws-org" style="font-size:1.05rem;color:var(--gold);">Workspace</strong>
+          <span class="badge" id="ws-role" style="margin-left:8px;">Role</span>
+          <div style="font-size:0.82rem;color:var(--muted);margin-top:4px;">
+            Clearing Ref: <span class="mono" id="ws-vault">Ready</span> •
+            Rate: <strong id="ws-fx">1 USD = 3,700 UGX</strong>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="sm secondary" onclick="openDoc('bank-credit-passport', 'SUMMARY')">Bank Credit Passport</button>
+          <button class="sm gold" onclick="openDoc('ura-tax-ledger', 'LEDGER')">Tax Ledger</button>
+          <button class="danger" onclick="logout()">Lock &amp; Exit</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tab-escrow', this)">1. Incoterms &amp; Split Escrow</button>
+        <button class="tab-btn" onclick="switchTab('tab-freight', this)">2. Freight Bidding</button>
+        <button class="tab-btn" onclick="switchTab('tab-efris', this)">3. EFRIS Invoices</button>
+        <button class="tab-btn" onclick="switchTab('tab-batch', this)">4. QR Batch Seal</button>
+        <button class="tab-btn" onclick="switchTab('tab-retail', this)">5. Retail POS &amp; 14d Credit</button>
+        <button class="tab-btn" onclick="switchTab('tab-docs', this)">6. All 8 Agency Docs</button>
+        <button class="tab-btn" onclick="switchTab('tab-owner', this)">7. Level 6 Owner &amp; Clearing Engine</button>
+      </div>
+
+      <!-- TAB 1: INCOTERMS ESCROW -->
+      <div id="tab-escrow" class="panel active grid-2">
+        <div class="card">
+          <h2>Lock Negotiable Incoterm 3-Bucket Escrow</h2>
+          <label>Incoterm</label>
+          <select id="deal-incoterm">
+            <option value="FOB">FOB (Free On Board — 30/70)</option>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crest Vault Africa — Sovereign Cross-Border Trade &amp; Compliance OS</title>
+  <style>
+    :root {
+      --bg: #07111e;
+      --card: #0f1e33;
+      --card-alt: #152842;
+      --border: #233b5c;
+      --gold: #eab308;
+      --emerald: #10b981;
+      --sky: #38bdf8;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .container { max-width: 1180px; margin: 0 auto; padding: 20px; }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px; padding: 18px 24px;
+      background: linear-gradient(135deg, #0b192c, #112642);
+      border-bottom: 2px solid var(--gold);
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand img { width: 54px; height: 54px; border-radius: 10px; object-fit: cover; border: 1px solid var(--gold); }
+    .brand h1 { margin: 0; font-size: 1.4rem; color: var(--gold); letter-spacing: 0.02em; }
+    .brand p { margin: 2px 0 0 0; font-size: 0.85rem; color: var(--muted); }
+    .badge {
+      display: inline-block; padding: 4px 10px; border-radius: 999px;
+      font-size: 0.75rem; font-weight: 700; background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; margin-top: 20px; }
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px; margin-bottom: 20px;
+    }
+    .card h2 { margin: 0 0 12px 0; font-size: 1.15rem; color: var(--gold); }
+    label { display: block; font-size: 0.82rem; color: var(--muted); margin: 10px 0 4px 0; font-weight: 600; }
+    input, select {
+      width: 100%; padding: 10px 12px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--card-alt);
+      color: var(--text); font-size: 0.92rem;
+    }
+    button {
+      margin-top: 14px; padding: 11px 16px; border: none; border-radius: 8px;
+      background: var(--emerald); color: #042f2e; font-weight: 700;
+      cursor: pointer; font-size: 0.92rem; width: 100%;
+    }
+    button.secondary { background: var(--sky); color: #082f49; }
+    button.gold { background: var(--gold); color: #1c1917; }
+    button.danger { background: var(--danger); color: #fff; width: auto; padding: 8px 14px; margin-top: 0; }
+    button.sm { width: auto; padding: 6px 12px; margin: 4px 4px 0 0; font-size: 0.8rem; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+    .tab-btn {
+      width: auto; margin: 0; background: var(--card-alt); color: var(--text);
+      border: 1px solid var(--border); padding: 9px 14px; font-size: 0.85rem;
+    }
+    .tab-btn.active { background: var(--gold); color: #111827; border-color: var(--gold); }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .topbar {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 12px; background: var(--card-alt); padding: 14px 18px;
+      border-radius: 10px; border: 1px solid var(--border);
+    }
+    .item-box {
+      background: var(--card-alt); border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px; margin-top: 12px; font-size: 0.88rem;
+    }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; color: var(--sky); word-break: break-all; }
+    .alert { padding: 10px 14px; border-radius: 8px; margin-top: 12px; font-size: 0.88rem; }
+    .alert.ok { background: rgba(16, 185, 129, 0.15); border: 1px solid var(--emerald); color: #6ee7b7; }
+    .alert.err { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: #fca5a5; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="/static/logo.png" alt="Crest Vault Africa" onerror="this.style.display='none'" />
+      <div>
+        <h1>CREST VAULT AFRICA</h1>
+        <p>Non-Custodial Sovereign Trade OS • 7-Role Ecosystem • Agency Printable Vault</p>
+      </div>
+    </div>
+    <div>
+      <span class="badge">Direct Bank &amp; Mobile Money Settlement • Zero Custody</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- AUTH & PUBLIC SCANNER VIEW -->
+    <div id="auth-view" class="grid-2">
+      <div class="card">
+        <h2>1. Create Business / Agency / Owner Account</h2>
+        <label>Jurisdiction</label>
+        <select id="signup-country">
+          <option value="UG">Uganda - URA and UNBS/NDA (UGX)</option>
+          <option value="KE">Kenya - KRA and KEBS (KES)</option>
+          <option value="NG">Nigeria - FIRS and SON/NAFDAC (NGN)</option>
+          <option value="ZA">South Africa - SARS and SABS (ZAR)</option>
+          <option value="RW">Rwanda - RRA and RSB (RWF)</option>
+          <option value="GH">Ghana - GRA and GSA (GHS)</option>
+          <option value="AE">UAE - FTA and ESMA (AED)</option>
+          <option value="LY">Libya (OFAC Sanctions Test)</option>
+        </select>
+
+        <label>Account Role (All 7 Roles + Level 6 Owner)</label>
+        <select id="signup-role">
+          <option value="IMPORTER">Importer / Kikuubo Trader</option>
+          <option value="EXPORTER">Factory / Agro-Exporter</option>
+          <option value="CARRIER">Freight Carrier / Fleet Owner</option>
+          <option value="WHOLESALER">Wholesaler / Distributor</option>
+          <option value="RETAILER">Retail Shop / Pharmacy</option>
+          <option value="AUDITOR">External CPA / Tax Accountant</option>
+          <option value="REGULATOR">Government Inspector (URA / UNBS / NDA)</option>
+          <option value="SUPER_ADMIN">Level 6 Platform Owner / Super-Admin</option>
+        </select>
+
+        <label>Full Name</label>
+        <input id="signup-name" placeholder="e.g., Sarah Namukasa" />
+
+        <label>URA / National TIN (or Truck Plate for Carriers)</label>
+        <input id="signup-tin" placeholder="e.g., 1004928172" />
+
+        <label>Company / Agency Name</label>
+        <input id="signup-org" placeholder="e.g., Kampala Solar &amp; Hardware Ltd" />
+
+        <label>Subscription Plan</label>
+        <select id="signup-plan">
+          <option value="PRO_TRADE">Pro Trade ($49/mo)</option>
+          <option value="FREE_STARTER">Free Starter ($0/mo)</option>
+          <option value="RETAIL_PRO">Retail Pro ($15/mo)</option>
+          <option value="FACTORY_ENTERPRISE">Factory Enterprise ($199/mo)</option>
+        </select>
+
+        <label>UNBS / NDA / Fleet Permit (Optional)</label>
+        <input id="signup-permit" placeholder="e.g., UNBS-Q-88412" />
+
+        <label>Super-Admin PIN (Level 6 Owner Only)</label>
+        <input id="signup-pin" type="password" placeholder="Leave blank unless Owner" />
+
+        <button onclick="handleSignup()">Provision Trade Clearing Account &amp; Enter Workspace</button>
+        <div id="signup-msg"></div>
+      </div>
+
+      <div class="card">
+        <h2>2. Public Product Authenticity Scanner (Level 1)</h2>
+        <p style="font-size:0.88rem;color:var(--muted);">Verify UNBS / NDA / SON / KEBS serialized batch codes in real time and detect counterfeit clones across cities.</p>
+        <label>Product Serial Code</label>
+        <input id="scan-serial" placeholder="e.g., BCH-2026-0001" />
+        <label>District / Scan Location</label>
+        <input id="scan-city" value="Kampala" />
+        <button class="secondary" onclick="verifySerial()">Verify Serial Authenticity</button>
+        <div id="scan-result"></div>
+      </div>
+    </div>
+
+    <!-- WORKSPACE VIEW -->
+    <div id="workspace-view" style="display:none;">
+      <div class="topbar">
+        <div>
+          <strong id="ws-org" style="font-size:1.05rem;color:var(--gold);">Workspace</strong>
+          <span class="badge" id="ws-role" style="margin-left:8px;">Role</span>
+          <div style="font-size:0.82rem;color:var(--muted);margin-top:4px;">
+            Clearing Ref: <span class="mono" id="ws-vault">Ready</span> •
+            Rate: <strong id="ws-fx">1 USD = 3,700 UGX</strong>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="sm secondary" onclick="openDoc('bank-credit-passport', 'SUMMARY')">Bank Credit Passport</button>
+          <button class="sm gold" onclick="openDoc('ura-tax-ledger', 'LEDGER')">Tax Ledger</button>
+          <button class="danger" onclick="logout()">Lock &amp; Exit</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tab-escrow', this)">1. Incoterms &amp; Split Escrow</button>
+        <button class="tab-btn" onclick="switchTab('tab-freight', this)">2. Freight Bidding</button>
+        <button class="tab-btn" onclick="switchTab('tab-efris', this)">3. EFRIS Invoices</button>
+        <button class="tab-btn" onclick="switchTab('tab-batch', this)">4. QR Batch Seal</button>
+        <button class="tab-btn" onclick="switchTab('tab-retail', this)">5. Retail POS &amp; 14d Credit</button>
+        <button class="tab-btn" onclick="switchTab('tab-docs', this)">6. All 8 Agency Docs</button>
+        <button class="tab-btn" onclick="switchTab('tab-owner', this)">7. Level 6 Owner &amp; Clearing Engine</button>
+      </div>
+
+      <!-- TAB 1: INCOTERMS ESCROW -->
+      <div id="tab-escrow" class="panel active grid-2">
+        <div class="card">
+          <h2>Lock Negotiable Incoterm 3-Bucket Escrow</h2>
+          <label>Incoterm</label>
+          <select id="deal-incoterm">
+            <option value="FOB">FOB (Free On Board — 30/70)</option>
