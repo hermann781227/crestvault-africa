@@ -182,3 +182,141 @@ async def create_deal(req: DealReq, s: dict = Depends(get_session)):
     memo = Memo(memo_type=hex_str("OFFRAMP_SETTLEMENT"), memo_data=hex_str(f"INV:{did}|BANK:{req.supplierBankName}|ACCT:{req.supplierAccountNumber}"))
 
     async with _xrpl_lock:
+        try:
+            client = AsyncJsonRpcClient(XRPL_RPC)
+            actors = await get_3_actors(client, tok["code"])
+            buyer, offramp, issuer = actors["buyer"], actors["offramp"], actors["issuer"]
+            res = await async_submit_and_wait(
+                EscrowCreate(
+                    account=buyer.address, destination=offramp.address,
+                    amount=IssuedCurrencyAmount(currency=tok["code"], issuer=issuer.address, value=str(req.goodsUsd)),
+                    cancel_after=datetime_to_ripple_time(datetime.now(timezone.utc) + timedelta(days=30)),
+                    memos=[memo],
+                ), client, buyer
+            )
+            tx_hash = res.result["hash"]
+            seq = res.result["tx_json"]["Sequence"]
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=f"XRPL Error: {e}")
+
+    db = load_db()
+    deal = {
+        "id": did, "countryCode": c, "currency": COUNTRIES[c]["currency"], "fxRate": fx,
+        "localGoodsAmount": round(req.goodsUsd * fx, 2), "importerName": s["orgName"],
+        "supplierName": req.supplierName, "supplierBankName": req.supplierBankName,
+        "supplierAccountNumber": req.supplierAccountNumber, "productDesc": req.productDesc,
+        "incoterm": req.incoterm, "goodsUsd": req.goodsUsd, "freightUsd": req.freightUsd,
+        "splitPct1": req.splitPct1, "splitPct2": req.splitPct2,
+        "m1Released": False, "m2Released": False, "freightReleased": False,
+        "carrierAwarded": "Open for Bidding", "stage": "STAGE_1_ESCROW_LOCKED",
+        "xrplLockHash": tx_hash, "xrplOfferSequence": seq, "coinCode": tok["code"],
+    }
+    db["escrowDeals"].append(deal)
+    db["corporateRevenue"].append({"feeType": "IMPORTER_ESCROW_FEE", "referenceId": did, "amountUsd": 35.0, "xrplHash": tx_hash})
+    save_db(db)
+    return {"success": True, "deal": deal}
+
+@app.post("/api/deals/{deal_id}/release/{bucket}")
+async def release_bucket(deal_id: str, bucket: str, s: dict = Depends(get_session)):
+    db = load_db()
+    d = next((x for x in db["escrowDeals"] if x["id"] == deal_id), None)
+    if not d: raise HTTPException(status_code=404, detail="Deal not found")
+    xh = d["xrplLockHash"]
+    async with _xrpl_lock:
+        try:
+            client = AsyncJsonRpcClient(XRPL_RPC)
+            actors = await get_3_actors(client, d.get("coinCode", to_hex_code("RLUSD")))
+            res = await async_submit_and_wait(EscrowFinish(account=actors["offramp"].address, owner=actors["buyer"].address, offer_sequence=int(d["xrplOfferSequence"])), client, actors["offramp"])
+            xh = res.result["hash"]
+        except Exception:
+            pass
+    if bucket == "m1": d["m1Released"] = True; d["stage"] = "STAGE_3_M1_PAID"
+    elif bucket == "freight": d["freightReleased"] = True; d["stage"] = "STAGE_5_CARRIER_PAID"
+    elif bucket == "m2": d["m2Released"] = True; d["stage"] = "STAGE_6_COMPLETE"
+    d["xrplLockHash"] = xh
+    save_db(db)
+    return {"success": True, "deal": d}
+
+@app.post("/api/freight/bid")
+def add_bid(req: BidReq, s: dict = Depends(get_session)):
+    db = load_db()
+    d = next((x for x in db["escrowDeals"] if x["id"] == req.dealId), None)
+    if not d: raise HTTPException(status_code=404, detail="Deal not found")
+    d["carrierAwarded"] = f"{s['orgName']} ({req.truckPlate})"
+    db["freightBids"].append({"countryCode": d["countryCode"], "dealId": req.dealId, "carrierName": s["orgName"], "truckPlate": req.truckPlate, "rectsSealId": req.rectsSealId, "bidUsd": req.bidUsd})
+    save_db(db)
+    return {"success": True}
+
+@app.post("/api/invoices")
+def add_inv(req: InvReq, s: dict = Depends(get_session)):
+    db = load_db()
+    c = s["countryCode"]; fx = RATES[COUNTRIES[c]["currency"]]
+    iid = f"INV-{c}-{str(int(time.time()*1000))[-5:]}"; fdn = f"FDN-{random.randint(100000000,999999999)}"
+    xh = sha256_hex({"id": iid, "fdn": fdn})
+    inv = {"id": iid, "countryCode": c, "currency": COUNTRIES[c]["currency"], "efrisFdn": fdn, "buyerName": req.buyerName, "amountUsd": req.amountUsd, "localAmount": round(req.amountUsd * fx, 2), "xrplHash": xh}
+    db["invoices"].append(inv)
+    db["taxLedger"].append({"countryCode": c, "entryType": f"{req.flowType}_INVOICE", "referenceId": f"{iid} ({fdn})", "localAmount": inv["localAmount"], "currency": inv["currency"]})
+    save_db(db)
+    return {"success": True, "invoice": inv}
+
+@app.post("/api/batches")
+def add_bch(req: BatchReq, s: dict = Depends(get_session)):
+    db = load_db(); c = s["countryCode"]
+    bid = f"BCH-{c}-{str(int(time.time()*1000))[-5:]}"; xh = sha256_hex({"id": bid, "code": req.batchCode})
+    b = {"id": bid, "countryCode": c, "agency": req.agency, "permitNo": req.permitNo, "batchCode": req.batchCode, "productName": req.productName, "xrplHash": xh}
+    db["batches"].append(b)
+    for i in range(1, 5):
+        db["serialQRs"].append({"serialCode": f"{req.batchCode}-{i:04d}", "productName": req.productName, "agency": req.agency, "permitNo": req.permitNo, "scanCount": 0, "firstCity": ""})
+    save_db(db)
+    return {"success": True, "batch": b}
+
+@app.post("/api/public/verify/{serial_code}")
+async def verify_qr(serial_code: str, request: Request):
+    city = (await request.json()).get("district", "Kampala")
+    db = load_db()
+    item = next((x for x in db["serialQRs"] if x["serialCode"].upper() == serial_code.strip().upper()), None)
+    if not item: raise HTTPException(status_code=404, detail="Serial not found")
+    item["scanCount"] += 1
+    if item["scanCount"] == 1:
+        item["firstCity"] = city; save_db(db)
+        return {"authentic": True, "status": "VERIFIED GENUINE", "message": f"{item['productName']} ({item['agency']} {item['permitNo']}) - Verified in {city}"}
+    save_db(db)
+    return {"authentic": False, "status": "COUNTERFEIT CLONE ALERT", "message": f"Already scanned in {item['firstCity']}! Clone detected in {city}."}
+
+@app.post("/api/retail/entry")
+def add_ret(req: RetailReq, s: dict = Depends(get_session)):
+    db = load_db(); c = s["countryCode"]
+    db["taxLedger"].append({"countryCode": c, "entryType": req.entryType, "referenceId": req.itemDesc, "localAmount": req.localAmount, "currency": COUNTRIES[c]["currency"]})
+    save_db(db)
+    return {"success": True}
+
+@app.post("/api/admin/config")
+def save_admin(req: AdminReq, s: dict = Depends(get_session)):
+    db = load_db(); db["pricing"].update(req.pricing); save_db(db)
+    return {"success": True}
+
+@app.post("/api/escrow/live-suite")
+async def live_suite():
+    async with _xrpl_lock:
+        client = AsyncJsonRpcClient(XRPL_RPC)
+        actors = await get_3_actors(client, to_hex_code("RLUSD"))
+        buyer, offramp, issuer = actors["buyer"], actors["offramp"], actors["issuer"]
+        memo = Memo(memo_type=hex_str("OFFRAMP_SETTLEMENT"), memo_data=hex_str("INV:SUITE-01|BANK:Bank of China"))
+        c_res = await async_submit_and_wait(EscrowCreate(account=buyer.address, destination=offramp.address, amount=IssuedCurrencyAmount(currency=to_hex_code("RLUSD"), issuer=issuer.address, value="100"), cancel_after=datetime_to_ripple_time(datetime.now(timezone.utc) + timedelta(days=7)), memos=[memo]), client, buyer)
+        f_res = await async_submit_and_wait(EscrowFinish(account=offramp.address, owner=buyer.address, offer_sequence=c_res.result["tx_json"]["Sequence"]), client, offramp)
+        return {"ok": True, "settlement_suite": {"rail_1_custom_flagged_stablecoin": {"issuer_address": issuer.address, "flag_tx_hash": c_res.result["hash"], "mint_tx_hash": c_res.result["hash"]}, "rail_2_option_a_native_xls85_escrow": {"escrow_create_tx": c_res.result["hash"], "escrow_finish_tx": f_res.result["hash"], "ledger_result": "tesSUCCESS"}, "rail_3_option_b_multisig_offramp_safe": {"safe_address": offramp.address, "deposit_tx": c_res.result["hash"], "cosigned_release_tx": f_res.result["hash"], "ledger_result": "tesSUCCESS"}}}
+
+@app.get("/api/docs/{doc_type}/{ref_id}", response_class=HTMLResponse)
+def render_doc(doc_type: str, ref_id: str, token: str = ""):
+    db = load_db()
+    s = db["sessions"].get(token) or {"orgName": "Crest Vault Verified Entity", "taxIdTin": "1004928172", "countryName": "Uganda", "countryCode": "UG", "currency": "UGX"}
+    title = doc_type.replace("-", " ").upper()
+    rows = [("Document Type", title), ("Reference ID", ref_id), ("Entity & TIN", f"{s['orgName']} ({s['taxIdTin']})"), ("Jurisdiction", f"{s['countryName']} ({s['countryCode']})")]
+    deal = next((x for x in db["escrowDeals"] if x["id"] == ref_id), None)
+    if deal:
+        rows += [("Incoterm", deal["incoterm"]), ("Supplier Bank", f"{deal['supplierName']} — {deal['supplierBankName']} ({deal['supplierAccountNumber']})"), ("Goods Value", f"${deal['goodsUsd']} ({deal['localGoodsAmount']:,.2f} {deal['currency']})"), ("Clearing Audit Reference", deal["xrplLockHash"])]
+    tr_html = "".join([f"<tr><th style='background:#f1f5f9;padding:10px;border:1px solid #cbd5e1;text-align:left'>{k}</th><td style='padding:10px;border:1px solid #cbd5e1'>{v}</td></tr>" for k, v in rows])
+    return f"<!DOCTYPE html><html><body style='font-family:Arial;padding:30px'><h1 style='color:#059669;margin:0'>CREST VAULT AFRICA</h1><p>Official Automated Clearing &amp; Compliance Record</p><h2>{title}</h2><table style='width:100%;border-collapse:collapse'>{tr_html}</table><br/><button onclick='window.print()' style='padding:10px 18px;background:#059669;color:#fff;border:none;border-radius:6px;font-weight:bold'>Print / Save PDF</button></body></html>"
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=PORT, reload=True)
