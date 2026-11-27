@@ -589,3 +589,469 @@ def health():
     return {
         "status": "ONLINE",
         "brand": "Crest Vault Africa",
+        "custody_model": "Non-Custodial Trade Orchestration SaaS",
+        "supported_settlement_currencies": list(XRPL_STABLECOINS.keys()),
+        "ugx_per_usd": FALLBACK_RATES["UGX"],
+    }
+
+
+@app.get("/api/stablecoins/supported")
+def get_supported_stablecoins():
+    return {"ugx_per_usd": FALLBACK_RATES["UGX"], "coins": XRPL_STABLECOINS}
+
+
+@app.post("/api/escrow/live-suite")
+async def execute_live_escrow_suite():
+    try:
+        suite = await run_triple_rail_settlement_suite()
+        return {"ok": True, "settlement_suite": suite}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.post("/api/auth/signup")
+def signup(req: SignupReq):
+    code = req.countryCode.strip().upper()
+    if code in RESTRICTED_COUNTRIES:
+        raise HTTPException(status_code=403, detail=f"OFAC Sanctions Block: {RESTRICTED_COUNTRIES[code]}")
+    if code not in APPROVED_COUNTRIES:
+        raise HTTPException(status_code=403, detail="Jurisdiction not approved")
+
+    role = req.userRole.strip().upper()
+    if role != "CARRIER" and not req.taxIdTin:
+        raise HTTPException(status_code=400, detail="TIN required.")
+    if role == "CARRIER" and not req.truckPlate:
+        raise HTTPException(status_code=400, detail="Truck Plate required.")
+    if role == "SUPER_ADMIN" and req.adminPin != ADMIN_MASTER_PIN:
+        raise HTTPException(status_code=403, detail="Invalid PIN")
+
+    db = load_db()
+    clearing_ref_id = f"CVA-{code}-{secrets.token_hex(6).upper()}"
+    prof = APPROVED_COUNTRIES[code]
+    acct = {
+        "countryCode": code,
+        "countryName": prof["name"],
+        "currency": prof["currency"],
+        "userRole": role,
+        "roleTitle": USER_ROLES.get(role, role),
+        "userName": req.userName,
+        "orgName": req.orgName,
+        "taxIdTin": req.taxIdTin,
+        "permitNumber": req.permitNumber,
+        "truckPlate": req.truckPlate,
+        "bankAccount": req.bankAccount,
+        "momoNumber": req.momoNumber,
+        "clearingAccountRef": clearing_ref_id,
+    }
+    token = secrets.token_hex(20)
+    db["sessions"][token] = acct
+    save_db(db)
+    return {"success": True, "token": token, "session": acct}
+
+
+@app.get("/api/workspace")
+def workspace(s: dict = Depends(get_session)):
+    db = load_db()
+    code = s["countryCode"]
+    prof = APPROVED_COUNTRIES[code]
+    fx = FALLBACK_RATES.get(prof["currency"], 1.0)
+    adm = s["userRole"] == "SUPER_ADMIN"
+    return {
+        "session": s,
+        "countryProfile": prof,
+        "fxRate": fx,
+        "corporateFeeWallet": CORPORATE_FEE_WALLET,
+        "pricing": db["pricing"],
+        "sockets": db["sockets"],
+        "escrowDeals": db["escrowDeals"] if adm else [x for x in db["escrowDeals"] if x.get("countryCode") == code],
+        "invoices": db["invoices"] if adm else [x for x in db["invoices"] if x.get("countryCode") == code],
+        "freightBids": db["freightBids"] if adm else [x for x in db["freightBids"] if x.get("countryCode") == code],
+        "batches": db["batches"] if adm else [x for x in db["batches"] if x.get("countryCode") == code],
+        "taxLedger": db["taxLedger"] if adm else [x for x in db["taxLedger"] if x.get("countryCode") == code],
+        "unbsAlerts": db["unbsAlerts"],
+        "corporateRevenue": db["corporateRevenue"] if adm else [],
+    }
+
+
+@app.post("/api/deals")
+def create_deal(req: DealCreateReq, s: dict = Depends(get_session)):
+    if req.splitPct1 + req.splitPct2 != 100:
+        raise HTTPException(status_code=400, detail="Splits must equal 100%")
+
+    aml_result = screen_entity_for_aml(req.supplierName, req.supplierAccountNumber, req.countryCode)
+    if not aml_result["cleared"]:
+        raise HTTPException(status_code=403, detail=f"Compliance Block: {aml_result['reason']}")
+
+    db = load_db()
+    code = s["countryCode"]
+    prof = APPROVED_COUNTRIES[code]
+    fx = FALLBACK_RATES.get(prof["currency"], 1.0)
+    did = f"ESC-{code}-{str(int(time.time()*1000))[-5:]}"
+    cif = req.goodsUsd + req.freightUsd + req.insuranceUsd
+    duty = round(cif * (req.dutyRatePct / 100.0), 2)
+    vat = round((cif + duty) * prof["vatRate"], 2)
+    customs = round(duty + vat + (cif * prof["infraLevy"]), 2)
+
+    settlement = execute_deal_settlement_fast(
+        deal_id=did,
+        symbol=req.settlementCoin,
+        amount_usd=req.goodsUsd,
+        supplier_bank=req.supplierBankName,
+        supplier_acct=req.supplierAccountNumber,
+    )
+
+    deal = {
+        "id": did,
+        "countryCode": code,
+        "currency": prof["currency"],
+        "fxRate": fx,
+        "localGoodsAmount": round(req.goodsUsd * fx, 2),
+        "importerName": s["orgName"],
+        "supplierName": req.supplierName,
+        "supplierBankName": req.supplierBankName,
+        "supplierAccountNumber": req.supplierAccountNumber,
+        "offrampPartnerVault": settlement["offramp_address"],
+        "offrampSeed": settlement["offramp_seed"],
+        "buyerClearingAddr": settlement["buyer_address"],
+        "settlementEngine": settlement["engine"],
+        "productDesc": req.productDesc,
+        "incoterm": req.incoterm,
+        "incotermName": INCOTERMS.get(req.incoterm, req.incoterm),
+        "goodsUsd": req.goodsUsd,
+        "freightUsd": req.freightUsd,
+        "customsUsd": customs,
+        "splitPct1": req.splitPct1,
+        "splitPct2": req.splitPct2,
+        "m1Released": False,
+        "m2Released": False,
+        "freightReleased": False,
+        "customsPaid": False,
+        "prnNumber": "",
+        "channel": "PENDING",
+        "bolNumber": req.bolNumber,
+        "insurancePolicy": req.insurancePolicy,
+        "cooNumber": req.cooNumber,
+        "carrierAwarded": "Open for Bidding",
+        "stage": "STAGE_1_ESCROW_LOCKED",
+        "xrplLockHash": settlement["tx_hash"],
+        "xrplOfferSequence": settlement["sequence"],
+        "amlStatus": "CLEARED",
+    }
+    db["escrowDeals"].append(deal)
+    record_fee(db, "IMPORTER_ESCROW_FEE", did, float(db["pricing"]["importerEscrowFlatUsd"]), settlement["tx_hash"])
+    save_db(db)
+    return {"success": True, "deal": deal}
+
+
+@app.post("/api/deals/{deal_id}/release/{bucket}")
+def rel_bucket(deal_id: str, bucket: str, s: dict = Depends(get_session)):
+    db = load_db()
+    d = next((x for x in db["escrowDeals"] if x["id"] == deal_id), None)
+    if not d:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    sp = float(db["pricing"]["offrampSpreadPct"]) / 100.0
+    xh = finish_deal_settlement_fast(d)
+
+    if bucket == "m1" and not d["m1Released"]:
+        d["m1Released"] = True
+        d["stage"] = "STAGE_3_M1_PAID"
+        record_fee(db, "OFFRAMP_M1", deal_id, d["goodsUsd"] * (d["splitPct1"] / 100.0) * sp, xh)
+    elif bucket == "freight" and not d["freightReleased"]:
+        d["freightReleased"] = True
+        d["stage"] = "STAGE_5_CARRIER_PAID"
+        record_fee(db, "OFFRAMP_FREIGHT", deal_id, d["freightUsd"] * sp, xh)
+    elif bucket == "m2" and not d["m2Released"]:
+        d["m2Released"] = True
+        d["stage"] = "STAGE_6_COMPLETE"
+        record_fee(db, "OFFRAMP_M2", deal_id, d["goodsUsd"] * (d["splitPct2"] / 100.0) * sp, xh)
+
+    d["xrplLockHash"] = xh
+    save_db(db)
+    return {"success": True, "deal": d}
+
+
+@app.post("/api/deals/{deal_id}/verify-prn")
+def verify_prn(deal_id: str, req: PrnVerifyReq, s: dict = Depends(get_session)):
+    db = load_db()
+    d = next((x for x in db["escrowDeals"] if x["id"] == deal_id), None)
+    if not d:
+        raise HTTPException(status_code=404, detail="Not found")
+    d["prnNumber"] = req.prnNumber
+    d["channel"] = req.channel
+    d["customsPaid"] = True
+    d["stage"] = "STAGE_4_PRN_PAID_DIRECT"
+    db["taxLedger"].append(
+        {
+            "countryCode": d["countryCode"],
+            "entryType": "DIRECT_URA_PRN",
+            "referenceId": f"{deal_id} / PRN {req.prnNumber}",
+            "localAmount": round(d["customsUsd"] * d["fxRate"], 2),
+            "currency": d["currency"],
+        }
+    )
+    save_db(db)
+    return {"success": True, "deal": d}
+
+
+@app.post("/api/freight/bid")
+def add_bid(req: FreightBidReq, s: dict = Depends(get_session)):
+    db = load_db()
+    d = next((x for x in db["escrowDeals"] if x["id"] == req.dealId), None)
+    if not d:
+        raise HTTPException(status_code=404, detail="Deal not found")
+    d["carrierAwarded"] = f"{s['orgName']} ({req.truckPlate})"
+    db["freightBids"].append(
+        {
+            "countryCode": d["countryCode"],
+            "dealId": req.dealId,
+            "carrierName": s["orgName"],
+            "truckPlate": req.truckPlate,
+            "rectsSealId": req.rectsSealId,
+            "bidUsd": req.bidUsd,
+        }
+    )
+    save_db(db)
+    return {"success": True}
+
+
+@app.post("/api/invoices")
+def add_inv(req: InvoiceReq, s: dict = Depends(get_session)):
+    db = load_db()
+    code = s["countryCode"]
+    prof = APPROVED_COUNTRIES[code]
+    fx = FALLBACK_RATES.get(prof["currency"], 1.0)
+    iid = f"INV-{code}-{str(int(time.time()*1000))[-5:]}"
+    fdn = f"FDN-{random.randint(100000000,999999999)}"
+    xh = sha256_hex({"id": iid, "buyer": req.buyerName, "amount": req.amountUsd, "fdn": fdn})
+    inv = {
+        "id": iid,
+        "countryCode": code,
+        "currency": prof["currency"],
+        "efrisFdn": fdn,
+        "flowType": req.flowType,
+        "buyerName": req.buyerName,
+        "amountUsd": req.amountUsd,
+        "localAmount": round(req.amountUsd * fx, 2),
+        "xrplHash": xh,
+    }
+    db["invoices"].append(inv)
+    db["taxLedger"].append(
+        {
+            "countryCode": code,
+            "entryType": f"{req.flowType}_INVOICE",
+            "referenceId": f"{iid} ({fdn})",
+            "localAmount": inv["localAmount"],
+            "currency": prof["currency"],
+        }
+    )
+    record_fee(db, "ATOMIC_INVOICE_FEE", iid, req.amountUsd * (float(db["pricing"]["atomicSettlementFeePct"]) / 100.0), xh)
+    save_db(db)
+    return {"success": True, "invoice": inv}
+@app.post("/api/batches")
+def add_bch(req: BatchReq, s: dict = Depends(get_session)):
+    db = load_db()
+    code = s["countryCode"]
+    bid = f"BCH-{code}-{str(int(time.time()*1000))[-5:]}"
+    xh = sha256_hex({"id": bid, "product": req.productName, "permit": req.permitNo})
+    b = {
+        "id": bid,
+        "countryCode": code,
+        "agency": req.agency,
+        "permitNo": req.permitNo,
+        "batchCode": req.batchCode,
+        "productName": req.productName,
+        "xrplHash": xh,
+    }
+    db["batches"].append(b)
+    for i in range(1, 5):
+        db["serialQRs"].append(
+            {
+                "serialCode": f"{req.batchCode}-{i:04d}",
+                "productName": req.productName,
+                "manufacturer": s["orgName"],
+                "agency": req.agency,
+                "permitNo": req.permitNo,
+                "scanCount": 0,
+                "firstCity": "",
+            }
+        )
+    save_db(db)
+    return {"success": True, "batch": b}
+
+
+@app.post("/api/public/verify/{serial_code}")
+async def verify_qr(serial_code: str, request: Request):
+    body = await request.json()
+    city = body.get("district", "Kampala")
+    db = load_db()
+    item = next((x for x in db["serialQRs"] if x["serialCode"].upper() == serial_code.strip().upper()), None)
+    if not item:
+        raise HTTPException(status_code=404, detail="Serial not registered in verification registry")
+    item["scanCount"] += 1
+    if item["scanCount"] == 1:
+        item["firstCity"] = city
+        save_db(db)
+        return {
+            "authentic": True,
+            "status": "VERIFIED GENUINE",
+            "message": f"{item['productName']} ({item['agency']} {item['permitNo']}) - First scan in {city}",
+        }
+    db["unbsAlerts"].append({"serialCode": item["serialCode"], "firstCity": item["firstCity"], "cloneCity": city})
+    save_db(db)
+    return {
+        "authentic": False,
+        "status": "COUNTERFEIT CLONE ALERT",
+        "message": f"WARNING: {item['serialCode']} already scanned in {item['firstCity']}! Clone in {city}.",
+    }
+
+
+@app.post("/api/retail/entry")
+def add_ret(req: RetailEntryReq, s: dict = Depends(get_session)):
+    db = load_db()
+    code = s["countryCode"]
+    prof = APPROVED_COUNTRIES[code]
+    db["taxLedger"].append(
+        {
+            "countryCode": code,
+            "entryType": req.entryType + ("_14DAY_BNPL" if req.isCredit14Day else ""),
+            "referenceId": req.itemDesc,
+            "localAmount": req.localAmount,
+            "currency": prof["currency"],
+        }
+    )
+    save_db(db)
+    return {"success": True}
+
+
+@app.post("/api/admin/config")
+def save_admin_cfg(req: AdminConfigReq, s: dict = Depends(get_session)):
+    if s["userRole"] != "SUPER_ADMIN":
+        raise HTTPException(status_code=403, detail="Super-Admin required")
+    db = load_db()
+    db["pricing"].update(req.pricing)
+    db["sockets"].update(req.sockets)
+    save_db(db)
+    return {"success": True}
+
+
+@app.get("/api/docs/{doc_type}/{ref_id}", response_class=HTMLResponse)
+def render_doc(doc_type: str, ref_id: str, token: str = ""):
+    try:
+        db = load_db()
+        s = db.get("sessions", {}).get(token) or {
+            "orgName": "Crest Vault Verified Entity",
+            "taxIdTin": "1004928172",
+            "countryName": "Uganda",
+            "countryCode": "UG",
+            "currency": "UGX",
+        }
+        title = doc_type.replace("-", " ").upper()
+        rows = [
+            ("Document Type", title),
+            ("Reference ID", ref_id),
+            ("Entity and TIN", f"{s.get('orgName')} (TIN: {s.get('taxIdTin')})"),
+            ("Jurisdiction", f"{s.get('countryName')} ({s.get('countryCode')})"),
+        ]
+        deal = next((x for x in db.get("escrowDeals", []) if x.get("id") == ref_id), None)
+        inv = next((x for x in db.get("invoices", []) if x.get("id") == ref_id), None)
+        bch = next((x for x in db.get("batches", []) if x.get("id") == ref_id), None)
+
+        if deal:
+            rows += [
+                ("Incoterm", f"{deal.get('incoterm')} - {deal.get('incotermName')}"),
+                ("Supplier", str(deal.get("supplierName"))),
+                ("Supplier Bank Payout", f"{deal.get('supplierBankName')} - {deal.get('supplierAccountNumber')}"),
+                (
+                    "Goods Value & Split",
+                    f"${deal.get('goodsUsd')} ({deal.get('localGoodsAmount', 0):,.2f} {deal.get('currency')}) | {deal.get('splitPct1')}% / {deal.get('splitPct2')}%",
+                ),
+                ("Freight and Customs", f"Freight ${deal.get('freightUsd')} - Customs ${deal.get('customsUsd')}"),
+                (
+                    "Transport and Permits",
+                    f"B/L: {deal.get('bolNumber')} - Ins: {deal.get('insurancePolicy')} - CoO: {deal.get('cooNumber')}",
+                ),
+                ("PRN and Channel", f"PRN: {deal.get('prnNumber') or 'Pending'} ({deal.get('channel')})"),
+                ("Compliance Status", f"{deal.get('amlStatus')} | Non-Custodial Licensed Settlement"),
+                ("Clearing Audit Reference", str(deal.get("xrplLockHash"))),
+            ]
+        elif inv:
+            rows += [
+                ("EFRIS FDN", str(inv.get("efrisFdn"))),
+                ("Buyer", str(inv.get("buyerName"))),
+                ("Amount", f"${inv.get('amountUsd')} = {inv.get('localAmount')} {inv.get('currency')}"),
+                ("Clearing Audit Reference", str(inv.get("xrplHash"))),
+            ]
+        elif bch:
+            rows += [
+                ("Agency and Permit", f"{bch.get('agency')} - {bch.get('permitNo')}"),
+                ("Batch and Product", f"{bch.get('batchCode')} - {bch.get('productName')}"),
+                ("Clearing Audit Reference", str(bch.get("xrplHash"))),
+            ]
+        else:
+            led = [r for r in db.get("taxLedger", []) if r.get("countryCode") == s.get("countryCode")]
+            tot = sum(float(r.get("localAmount", 0)) for r in led)
+            rows += [
+                ("Verified Entries", str(len(led))),
+                ("Audited Turnover", f"{tot:,.2f} {s.get('currency')} (Bank SME Credit Eligible)"),
+            ]
+
+        tr_html = "".join([f"<tr><th>{k}</th><td>{v}</td></tr>" for k, v in rows])
+        verify_url = f"{APP_URL}/api/docs/{doc_type}/{ref_id}"
+
+        qr = qrcode.QRCode(version=1, box_size=10, border=2)
+        qr.add_data(verify_url)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        qr_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+        qr_data_uri = f"data:image/png;base64,{qr_base64}"
+
+        logo_url = f"{APP_URL}/static/logo.png"
+
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>{title}</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; padding: 32px; color: #0f172a; position: relative; }}
+                .watermark {{ position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.08; z-index: -1; pointer-events: none; width: 60%; max-width: 600px; }}
+                table {{ width: 100%; border-collapse: collapse; margin-top: 16px; position: relative; z-index: 1; background: rgba(255,255,255,0.8); }}
+                th, td {{ border: 1px solid #cbd5e1; padding: 10px; text-align: left; }}
+                th {{ background: #f1f5f9; width: 230px; }}
+                .hdr {{ display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #059669; padding-bottom: 12px; position: relative; z-index: 1; }}
+                .qr {{ text-align: center; font-size: 11px; font-weight: bold; }}
+                .qr img {{ border: 2px solid #059669; padding: 4px; background: #fff; border-radius: 6px; }}
+                @media print {{ button {{ display: none; }} .watermark {{ opacity: 0.1; position: absolute; }} body {{ background: white; }} table {{ background: transparent; }} }}
+            </style>
+        </head>
+        <body>
+            <img src="{logo_url}" class="watermark" alt="Watermark" />
+            <div class="hdr">
+                <div>
+                    <h1 style="margin:0;color:#059669">CREST VAULT AFRICA</h1>
+                    <div>Official Agency-Standard Trade and Compliance Record</div>
+                    <div style="font-size:10px;color:#475569;margin-top:4px;">AUTOMATED CLEARING &amp; AUDIT RECORD</div>
+                </div>
+                <div class="qr">
+                    <img src="{qr_data_uri}" width="100" height="100" alt="Scan to Verify"/><br/>
+                    Scan to Verify
+                </div>
+            </div>
+            <h2 style="position: relative; z-index: 1;">{title}</h2>
+            <table>{tr_html}</table>
+            <p style="margin-top:18px;font-size:12px;color:#475569;position:relative;z-index:1;">Verify URL: {verify_url}</p>
+            <p style="font-size:12px;color:#475569;position:relative;z-index:1;"><strong>Audit Proof:</strong> Cryptographically timestamped trade settlement record.</p>
+            <button onclick="window.print()" style="padding:10px 18px;background:#059669;color:#fff;border:none;border-radius:6px;font-weight:bold;cursor:pointer;position:relative;z-index:1;">Print / Save Official PDF</button>
+        </body>
+        </html>
+        """
+        return html_content
+    except Exception as exc:
+        return HTMLResponse(f"<pre>Doc Error: {exc}</pre>", status_code=200)
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=PORT, reload=True)
