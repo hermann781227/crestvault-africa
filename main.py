@@ -619,6 +619,35 @@ async def run_triple_rail_settlement_suite() -> Dict[str, Any]:
     }
 
 
+_CACHED_SANDBOX_ACTORS: Dict[str, Any] = {}
+
+
+async def get_or_init_sandbox_actors(client: AsyncJsonRpcClient, currency_code: str) -> Dict[str, Any]:
+    """Provisions and funds Issuer, Buyer, and Off-Ramp Partner once so every deal settles in ~4 seconds."""
+    if currency_code in _CACHED_SANDBOX_ACTORS:
+        return _CACHED_SANDBOX_ACTORS[currency_code]
+
+    buyer, offramp_partner = await asyncio.gather(
+        generate_faucet_wallet(client, debug=False),
+        generate_faucet_wallet(client, debug=False),
+    )
+    issued = await provision_flag_enabled_issuer_async(
+        client=client,
+        currency_code=currency_code,
+        buyer=buyer,
+        offramp_partner=offramp_partner,
+        enable_locking_flag=True,
+        mint_amount="1000000",
+    )
+    actors = {
+        "buyer": buyer,
+        "offramp_partner": offramp_partner,
+        "issuer_address": issued["issuer_address"],
+    }
+    _CACHED_SANDBOX_ACTORS[currency_code] = actors
+    return actors
+
+
 def execute_deal_settlement_fast(
     deal_id: str,
     symbol: str,
@@ -626,23 +655,17 @@ def execute_deal_settlement_fast(
     supplier_bank: str,
     supplier_acct: str,
 ) -> Dict[str, Any]:
+    """Executes a real on-chain XRPL EscrowCreate in ~4 seconds with zero fake hash fallbacks."""
     token = XRPL_STABLECOINS.get(symbol.upper(), XRPL_STABLECOINS["RLUSD"])
     memo = build_offramp_routing_memo(deal_id, supplier_bank, supplier_acct, "CNY")
 
     async def _run() -> Dict[str, Any]:
         client = AsyncJsonRpcClient(XRPL_TESTNET_URL)
-        buyer, offramp_partner = await asyncio.gather(
-            generate_faucet_wallet(client, debug=False),
-            generate_faucet_wallet(client, debug=False),
-        )
-        issued = await provision_flag_enabled_issuer_async(
-            client=client,
-            currency_code=token["currency_code"],
-            buyer=buyer,
-            offramp_partner=offramp_partner,
-            enable_locking_flag=True,
-            mint_amount=str(max(float(amount_usd) * 2, 1000.0)),
-        )
+        actors = await get_or_init_sandbox_actors(client, token["currency_code"])
+        buyer = actors["buyer"]
+        offramp_partner = actors["offramp_partner"]
+        issuer_address = actors["issuer_address"]
+
         now = datetime.now(timezone.utc)
         create_res = await async_submit_and_wait(
             EscrowCreate(
@@ -650,7 +673,7 @@ def execute_deal_settlement_fast(
                 destination=offramp_partner.address,
                 amount=IssuedCurrencyAmount(
                     currency=token["currency_code"],
-                    issuer=issued["issuer_address"],
+                    issuer=issuer_address,
                     value=str(amount_usd),
                 ),
                 cancel_after=datetime_to_ripple_time(now + timedelta(days=30)),
@@ -665,28 +688,13 @@ def execute_deal_settlement_fast(
             "offramp_address": offramp_partner.address,
             "offramp_seed": offramp_partner.seed,
             "buyer_address": buyer.address,
-            "issuer_address": issued["issuer_address"],
+            "issuer_address": issuer_address,
             "engine": "OPTION_A_NATIVE_XLS85",
         }
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         future = executor.submit(asyncio.run, _run())
-        try:
-            res = future.result(timeout=18.0)
-            if res:
-                return res
-        except Exception as exc:
-            print(f"Settlement fallback triggered: {exc}")
-
-    return {
-        "tx_hash": sha256_hex({"deal": deal_id, "ts": time.time()}),
-        "sequence": 0,
-        "offramp_address": OFFRAMP_HOLDING_ADDRESS or Wallet.create().address,
-        "offramp_seed": "",
-        "buyer_address": "",
-        "issuer_address": token["mainnet_issuer"],
-        "engine": "OPTION_B_MULTISIG_OFFRAMP_SAFE",
-    }
+        return future.result(timeout=45.0)
 
 
 def finish_deal_settlement_fast(deal: Dict[str, Any]) -> str:
