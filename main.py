@@ -830,8 +830,278 @@ def create_deal(req: DealCreateReq, s: dict = Depends(get_session)):
     aml_result = screen_entity_for_aml(req.supplierName, req.supplierAccountNumber, req.countryCode)
     if not aml_result["cleared"]:
         raise HTTPException(status_code=403, detail=f"Compliance Block: {aml_result['reason']}")
-
     db = load_db()
     code = s["countryCode"]
+    prof = APPROVED_COUNTRIES[code]
+    fx = FALLBACK_RATES.get(prof["currency"], 1.0)
+    did = f"ESC-{code}-{str(int(time.time()*1000))[-5:]}"
+    cif = req.goodsUsd + req.freightUsd + req.insuranceUsd
+    duty = round(cif * (req.dutyRatePct / 100.0), 2)
+    vat = round((cif + duty) * prof["vatRate"], 2)
+    customs = round(duty + vat + (cif * prof["infraLevy"]), 2)
+
+    settlement = execute_deal_settlement_fast(
+        deal_id=did,
+        symbol=req.settlementCoin,
+        amount_usd=req.goodsUsd,
+        supplier_bank=req.supplierBankName,
+        supplier_acct=req.supplierAccountNumber,
+    )
+
+    deal = {
+        "id": did,
+        "countryCode": code,
+        "currency": prof["currency"],
+        "fxRate": fx,
+        "localGoodsAmount": round(req.goodsUsd * fx, 2),
+        "importerName": s["orgName"],
+        "supplierName": req.supplierName,
+        "supplierBankName": req.supplierBankName,
+        "supplierAccountNumber": req.supplierAccountNumber,
+        "offrampPartnerVault": settlement["offramp_address"],
+        "offrampSeed": settlement["offramp_seed"],
+        "buyerClearingAddr": settlement["buyer_address"],
+        "settlementEngine": settlement["engine"],
+        "productDesc": req.productDesc,
+        "incoterm": req.incoterm,
+        "incotermName": INCOTERMS.get(req.incoterm, req.incoterm),
+        "goodsUsd": req.goodsUsd,
+        "freightUsd": req.freightUsd,
+        "customsUsd": customs,
+        "splitPct1": req.splitPct1,
+        "splitPct2": req.splitPct2,
+        "m1Released": False,
+        "m2Released": False,
+        "freightReleased": False,
+        "customsPaid": False,
+        "prnNumber": "",
+        "channel": "PENDING",
+        "bolNumber": req.bolNumber,
+        "insurancePolicy": req.insurancePolicy,
+        "cooNumber": req.cooNumber,
+        "carrierAwarded": "Open for Bidding",
+        "stage": "STAGE_1_ESCROW_LOCKED",
+        "xrplLockHash": settlement["tx_hash"],
+        "xrplOfferSequence": settlement["sequence"],
+        "amlStatus": "CLEARED",
+    }
+    db["escrowDeals"].append(deal)
+    record_fee(db, "IMPORTER_ESCROW_FEE", did, float(db["pricing"]["importerEscrowFlatUsd"]), settlement["tx_hash"])
+    save_db(db)
+    return {"success": True, "deal": deal}
 
 
+@app.post("/api/deals/{deal_id}/release/{bucket}")
+def rel_bucket(deal_id: str, bucket: str, s: dict = Depends(get_session)):
+    db = load_db()
+    d = next((x for x in db["escrowDeals"] if x["id"] == deal_id), None)
+    if not d:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    sp = float(db["pricing"]["offrampSpreadPct"]) / 100.0
+    xh = finish_deal_settlement_fast(d)
+
+    if bucket == "m1" and not d["m1Released"]:
+        d["m1Released"] = True
+        d["stage"] = "STAGE_3_M1_PAID"
+        record_fee(db, "OFFRAMP_M1", deal_id, d["goodsUsd"] * (d["splitPct1"] / 100.0) * sp, xh)
+    elif bucket == "freight" and not d["freightReleased"]:
+        d["freightReleased"] = True
+        d["stage"] = "STAGE_5_CARRIER_PAID"
+        record_fee(db, "OFFRAMP_FREIGHT", deal_id, d["freightUsd"] * sp, xh)
+    elif bucket == "m2" and not d["m2Released"]:
+        d["m2Released"] = True
+        d["stage"] = "STAGE_6_COMPLETE"
+        record_fee(db, "OFFRAMP_M2", deal_id, d["goodsUsd"] * (d["splitPct2"] / 100.0) * sp, xh)
+
+    d["xrplLockHash"] = xh
+    save_db(db)
+    return {"success": True, "deal": d}
+
+
+@app.post("/api/deals/{deal_id}/verify-prn")
+def verify_prn(deal_id: str, req: PrnVerifyReq, s: dict = Depends(get_session)):
+    db = load_db()
+    d = next((x for x in db["escrowDeals"] if x["id"] == deal_id), None)
+    if not d:
+        raise HTTPException(status_code=404, detail="Not found")
+    d["prnNumber"] = req.prnNumber
+    d["channel"] = req.channel
+    d["customsPaid"] = True
+    d["stage"] = "STAGE_4_PRN_PAID_DIRECT"
+    db["taxLedger"].append(
+        {
+            "countryCode": d["countryCode"],
+            "entryType": "DIRECT_URA_PRN",
+            "referenceId": f"{deal_id} / PRN {req.prnNumber}",
+            "localAmount": round(d["customsUsd"] * d["fxRate"], 2),
+            "currency": d["currency"],
+        }
+    )
+    save_db(db)
+    return {"success": True, "deal": d}
+
+
+@app.post("/api/freight/bid")
+def add_bid(req: FreightBidReq, s: dict = Depends(get_session)):
+    db = load_db()
+    d = next((x for x in db["escrowDeals"] if x["id"] == req.dealId), None)
+    if not d:
+        raise HTTPException(status_code=404, detail="Deal not found")
+    d["carrierAwarded"] = f"{s['orgName']} ({req.truckPlate})"
+    db["freightBids"].append(
+        {
+            "countryCode": d["countryCode"],
+            "dealId": req.dealId,
+            "carrierName": s["orgName"],
+            "truckPlate": req.truckPlate,
+            "rectsSealId": req.rectsSealId,
+            "bidUsd": req.bidUsd,
+        }
+    )
+    save_db(db)
+    return {"success": True}
+
+
+@app.post("/api/invoices")
+def add_inv(req: InvoiceReq, s: dict = Depends(get_session)):
+    db = load_db()
+    code = s["countryCode"]
+    prof = APPROVED_COUNTRIES[code]
+    fx = FALLBACK_RATES.get(prof["currency"], 1.0)
+    iid = f"INV-{code}-{str(int(time.time()*1000))[-5:]}"
+    fdn = f"FDN-{random.randint(100000000,999999999)}"
+    xh = sha256_hex({"id": iid, "buyer": req.buyerName, "amount": req.amountUsd, "fdn": fdn})
+    inv = {
+        "id": iid,
+        "countryCode": code,
+        "currency": prof["currency"],
+        "efrisFdn": fdn,
+        "flowType": req.flowType,
+        "buyerName": req.buyerName,
+        "amountUsd": req.amountUsd,
+        "localAmount": round(req.amountUsd * fx, 2),
+        "xrplHash": xh,
+    }
+    db["invoices"].append(inv)
+    db["taxLedger"].append(
+        {
+            "countryCode": code,
+            "entryType": f"{req.flowType}_INVOICE",
+            "referenceId": f"{iid} ({fdn})",
+            "localAmount": inv["localAmount"],
+            "currency": prof["currency"],
+        }
+    )
+    record_fee(db, "ATOMIC_INVOICE_FEE", iid, req.amountUsd * (float(db["pricing"]["atomicSettlementFeePct"]) / 100.0), xh)
+    save_db(db)
+    return {"success": True, "invoice": inv}
+
+
+@app.post("/api/batches")
+def add_bch(req: BatchReq, s: dict = Depends(get_session)):
+    db = load_db()
+    code = s["countryCode"]
+    bid = f"BCH-{code}-{str(int(time.time()*1000))[-5:]}"
+    xh = sha256_hex({"id": bid, "product": req.productName, "permit": req.permitNo})
+    b = {
+        "id": bid,
+        "countryCode": code,
+        "agency": req.agency,
+        "permitNo": req.permitNo,
+        "batchCode": req.batchCode,
+        "productName": req.productName,
+        "xrplHash": xh,
+    }
+    db["batches"].append(b)
+    for i in range(1, 5):
+        db["serialQRs"].append(
+            {
+                "serialCode": f"{req.batchCode}-{i:04d}",
+                "productName": req.productName,
+                "manufacturer": s["orgName"],
+                "agency": req.agency,
+                "permitNo": req.permitNo,
+                "scanCount": 0,
+                "firstCity": "",
+            }
+        )
+    save_db(db)
+    return {"success": True, "batch": b}
+
+
+@app.post("/api/public/verify/{serial_code}")
+async def verify_qr(serial_code: str, request: Request):
+    body = await request.json()
+    city = body.get("district", "Kampala")
+    db = load_db()
+    item = next((x for x in db["serialQRs"] if x["serialCode"].upper() == serial_code.strip().upper()), None)
+    if not item:
+        raise HTTPException(status_code=404, detail="Serial not registered in verification registry")
+    item["scanCount"] += 1
+    if item["scanCount"] == 1:
+        item["firstCity"] = city
+        save_db(db)
+        return {
+            "authentic": True,
+            "status": "VERIFIED GENUINE",
+            "message": f"{item['productName']} ({item['agency']} {item['permitNo']}) - First scan in {city}",
+        }
+    db["unbsAlerts"].append({"serialCode": item["serialCode"], "firstCity": item["firstCity"], "cloneCity": city})
+    save_db(db)
+    return {
+        "authentic": False,
+        "status": "COUNTERFEIT CLONE ALERT",
+        "message": f"WARNING: {item['serialCode']} already scanned in {item['firstCity']}! Clone in {city}.",
+    }
+
+
+@app.post("/api/retail/entry")
+def add_ret(req: RetailEntryReq, s: dict = Depends(get_session)):
+    db = load_db()
+    code = s["countryCode"]
+    prof = APPROVED_COUNTRIES[code]
+    db["taxLedger"].append(
+        {
+            "countryCode": code,
+            "entryType": req.entryType + ("_14DAY_BNPL" if req.isCredit14Day else ""),
+            "referenceId": req.itemDesc,
+            "localAmount": req.localAmount,
+            "currency": prof["currency"],
+        }
+    )
+    save_db(db)
+    return {"success": True}
+
+
+@app.post("/api/admin/config")
+def save_admin_cfg(req: AdminConfigReq, s: dict = Depends(get_session)):
+    if s["userRole"] != "SUPER_ADMIN":
+        raise HTTPException(status_code=403, detail="Super-Admin required")
+    db = load_db()
+    db["pricing"].update(req.pricing)
+    db["sockets"].update(req.sockets)
+    save_db(db)
+    return {"success": True}
+
+
+@app.get("/api/docs/{doc_type}/{ref_id}", response_class=HTMLResponse)
+def render_doc(doc_type: str, ref_id: str, token: str = ""):
+    try:
+        db = load_db()
+        s = db.get("sessions", {}).get(token) or {
+            "orgName": "Crest Vault Verified Entity",
+            "taxIdTin": "1004928172",
+            "countryName": "Uganda",
+            "countryCode": "UG",
+            "currency": "UGX",
+        }
+        title = doc_type.replace("-", " ").upper()
+        rows = [
+            ("Document Type", title),
+            ("Reference ID", ref_id),
+            ("Entity and TIN", f"{s.get('orgName')} (TIN: {s.get('taxIdTin')})"),
+            ("Jurisdiction", f"{s.get('countryName')} ({s.get('countryCode')})"),
+        ]
+        deal = next((x for x in db.get("escrowDeals", []) if x.get("id") == ref_id), None)
+        inv = next((x for x in db.get("invoices", []) if x.get("id") == ref_id), None)
