@@ -377,10 +377,19 @@ async def provision_flag_enabled_issuer_async(
     offramp_partner: Wallet,
     enable_locking_flag: bool = True,
     mint_amount: str = "5000",
+    master_funder: Optional[Wallet] = None,
 ) -> Dict[str, Any]:
-    issuer = await generate_faucet_wallet(client, debug=False)
-    flag_tx_hash = None
+    if master_funder:
+        issuer = Wallet.create()
+        await async_submit_and_wait(
+            Payment(account=master_funder.address, destination=issuer.address, amount=xrp_to_drops(10)),
+            client,
+            master_funder,
+        )
+    else:
+        issuer = await generate_faucet_wallet(client, debug=False)
 
+    flag_tx_hash = None
     if enable_locking_flag:
         flag_res = await async_submit_and_wait(
             AccountSet(account=issuer.address, set_flag=ASF_ALLOW_TRUSTLINE_LOCKING),
@@ -426,6 +435,7 @@ async def provision_flag_enabled_issuer_async(
         "mint_tx_hash": mint_res.result.get("hash"),
         "minted_amount": mint_amount,
     }
+
 
 
 async def execute_routed_escrow_async(
@@ -625,7 +635,7 @@ _WARMUP_LOCK = threading.Lock()
 
 
 async def get_or_init_sandbox_actors(client: AsyncJsonRpcClient, currency_code: str) -> Dict[str, Any]:
-    """Provisions and caches Issuer, Buyer, and Off-Ramp Partner wallets in DB so deals settle in ~4s."""
+    """Provisions and caches Issuer, Buyer, and Off-Ramp Partner wallets directly on-chain (zero faucet 429s)."""
     if currency_code in _CACHED_SANDBOX_ACTORS:
         return _CACHED_SANDBOX_ACTORS[currency_code]
 
@@ -640,18 +650,44 @@ async def get_or_init_sandbox_actors(client: AsyncJsonRpcClient, currency_code: 
         _CACHED_SANDBOX_ACTORS[currency_code] = actors
         return actors
 
-    buyer, offramp_partner = await asyncio.gather(
-        generate_faucet_wallet(client, debug=False),
-        generate_faucet_wallet(client, debug=False),
-    )
-    issued = await provision_flag_enabled_issuer_async(
-        client=client,
-        currency_code=currency_code,
-        buyer=buyer,
-        offramp_partner=offramp_partner,
-        enable_locking_flag=True,
-        mint_amount="10000000",
-    )
+    master_seed = os.getenv("XRPL_MASTER_SEED", "").strip()
+    if master_seed:
+        master = Wallet.from_seed(master_seed)
+        buyer = Wallet.create()
+        offramp_partner = Wallet.create()
+        await async_submit_and_wait(
+            Payment(account=master.address, destination=buyer.address, amount=xrp_to_drops(15)),
+            client,
+            master,
+        )
+        await async_submit_and_wait(
+            Payment(account=master.address, destination=offramp_partner.address, amount=xrp_to_drops(15)),
+            client,
+            master,
+        )
+        issued = await provision_flag_enabled_issuer_async(
+            client=client,
+            currency_code=currency_code,
+            buyer=buyer,
+            offramp_partner=offramp_partner,
+            enable_locking_flag=True,
+            mint_amount="10000000",
+            master_funder=master,
+        )
+    else:
+        buyer, offramp_partner = await asyncio.gather(
+            generate_faucet_wallet(client, debug=False),
+            generate_faucet_wallet(client, debug=False),
+        )
+        issued = await provision_flag_enabled_issuer_async(
+            client=client,
+            currency_code=currency_code,
+            buyer=buyer,
+            offramp_partner=offramp_partner,
+            enable_locking_flag=True,
+            mint_amount="10000000",
+        )
+
     actors = {
         "buyer": buyer,
         "offramp_partner": offramp_partner,
