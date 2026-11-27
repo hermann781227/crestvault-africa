@@ -27,7 +27,7 @@ APP_URL = os.getenv("APP_URL", f"http://localhost:{PORT}").rstrip("/")
 ADMIN_MASTER_PIN = os.getenv("ADMIN_MASTER_PIN", "CREST2026")
 CORPORATE_FEE_WALLET = os.getenv("CORPORATE_FEE_WALLET", "rCrestVaultAfricaCorporateVault1111111")
 XRPL_MASTER_SEED = os.getenv("XRPL_MASTER_SEED", "sEd7SWBibuQTqXKN7YYWmRQVzz75XSd").strip()
-XRPL_RPC = "https://rippletest.net"
+XRPL_RPC = "https://s.altnet.rippletest.net:51234"
 DB_FILE = "crestvault_clean_db.json"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
