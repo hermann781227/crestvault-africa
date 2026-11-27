@@ -1,242 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Crest Vault Africa</title>
-<style>:root{--bg:#020617;--card:#0f172a;--in:#1e293b;--bd:#334155;--tx:#f1f5f9;--mt:#94a3b8;--em:#059669;--sk:#0284c7;--am:#d97706;--rs:#e11d48;--id:#4f46e5}*{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--tx);font-family:Segoe UI,Roboto,sans-serif;line-height:1.5}.hidden{display:none!important}.container{max-width:1220px;margin:0 auto;padding:24px 16px}.hero{text-align:center;margin-bottom:24px}.pill-top{display:inline-block;padding:4px 12px;border-radius:99px;background:rgba(16,185,129,.15);border:1px solid #10b981;color:#34d399;font-size:12px;margin-bottom:8px}h1{font-size:26px;font-weight:800;margin-bottom:6px}h2{font-size:16px;margin-bottom:10px}.sub{color:var(--mt);font-size:14px}.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px}.row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px;margin-bottom:16px}.sub-card{background:var(--in);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:10px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}label{display:block;font-size:12px;color:var(--mt);margin:9px 0 4px}input,select{width:100%;background:var(--in);border:1px solid var(--bd);border-radius:8px;padding:9px 11px;color:#fff;font-size:13px}input::placeholder{color:#64748b;font-style:italic}button{cursor:pointer;border:none;border-radius:8px;padding:9px 13px;font-weight:700;font-size:12px;color:#fff}.btn-full{width:100%;margin-top:14px}.btn-em{background:var(--em)}.btn-am{background:var(--am)}.btn-sk{background:var(--sk)}.btn-id{background:var(--id)}.btn-rs{background:var(--rs)}.btn-sm{padding:6px 10px;font-size:11px}.topbar{background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:50}.top-in{max-width:1220px;margin:0 auto;padding:12px 16px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}.tabs{max-width:1220px;margin:0 auto;padding:0 16px 12px;display:flex;flex-wrap:wrap;gap:6px}.tab-btn{background:var(--in);color:#cbd5e1}.tab-btn.active{background:var(--em);color:#fff}.toast{padding:12px;border-radius:10px;margin-bottom:16px;font-size:13px;font-weight:600;border:1px solid}.toast-ok{background:rgba(16,185,129,.15);border-color:#10b981;color:#6ee7b7}.toast-err{background:rgba(225,29,72,.15);border-color:var(--rs);color:#fda4af}.pill{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700}.p-gr{background:rgba(16,185,129,.2);color:#34d399}.p-sk{background:rgba(2,132,199,.25);color:#38bdf8}</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crest Vault Africa — Sovereign Cross-Border Trade &amp; Compliance OS</title>
+  <style>
+    :root {
+      --bg: #07111e;
+      --card: #0f1e33;
+      --card-alt: #152842;
+      --border: #233b5c;
+      --gold: #eab308;
+      --emerald: #10b981;
+      --sky: #38bdf8;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .container { max-width: 1180px; margin: 0 auto; padding: 20px; }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px; padding: 18px 24px;
+      background: linear-gradient(135deg, #0b192c, #112642);
+      border-bottom: 2px solid var(--gold);
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand img { width: 54px; height: 54px; border-radius: 10px; object-fit: cover; border: 1px solid var(--gold); }
+    .brand h1 { margin: 0; font-size: 1.4rem; color: var(--gold); letter-spacing: 0.02em; }
+    .brand p { margin: 2px 0 0 0; font-size: 0.85rem; color: var(--muted); }
+    .badge {
+      display: inline-block; padding: 4px 10px; border-radius: 999px;
+      font-size: 0.75rem; font-weight: 700; background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; margin-top: 20px; }
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px; margin-bottom: 20px;
+    }
+    .card h2 { margin: 0 0 12px 0; font-size: 1.15rem; color: var(--gold); }
+    label { display: block; font-size: 0.82rem; color: var(--muted); margin: 10px 0 4px 0; font-weight: 600; }
+    input, select {
+      width: 100%; padding: 10px 12px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--card-alt);
+      color: var(--text); font-size: 0.92rem;
+    }
+    button {
+      margin-top: 14px; padding: 11px 16px; border: none; border-radius: 8px;
+      background: var(--emerald); color: #042f2e; font-weight: 700;
+      cursor: pointer; font-size: 0.92rem; width: 100%;
+    }
+    button.secondary { background: var(--sky); color: #082f49; }
+    button.gold { background: var(--gold); color: #1c1917; }
+    button.danger { background: var(--danger); color: #fff; width: auto; padding: 8px 14px; margin-top: 0; }
+    button.sm { width: auto; padding: 6px 12px; margin: 4px 4px 0 0; font-size: 0.8rem; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+    .tab-btn {
+      width: auto; margin: 0; background: var(--card-alt); color: var(--text);
+      border: 1px solid var(--border); padding: 9px 14px; font-size: 0.85rem;
+    }
+    .tab-btn.active { background: var(--gold); color: #111827; border-color: var(--gold); }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .topbar {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 12px; background: var(--card-alt); padding: 14px 18px;
+      border-radius: 10px; border: 1px solid var(--border);
+    }
+    .item-box {
+      background: var(--card-alt); border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px; margin-top: 12px; font-size: 0.88rem;
+    }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; color: var(--sky); word-break: break-all; }
+    .alert { padding: 10px 14px; border-radius: 8px; margin-top: 12px; font-size: 0.88rem; }
+    .alert.ok { background: rgba(16, 185, 129, 0.15); border: 1px solid var(--emerald); color: #6ee7b7; }
+    .alert.err { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: #fca5a5; }
+  </style>
 </head>
 <body>
-<div id="gateScreen" class="container">
-<div class="hero">
-<img src="/static/logo.png" alt="Crest Vault Africa" style="width:100%;max-width:440px;max-height:200px;object-fit:contain;margin-bottom:10px"/>
-<br/>
-<div class="pill-top">Non-Custodial XRPL Trade OS - 7-Role Ecosystem - Agency Printable Vault</div>
-<h1>Crest Vault Africa</h1>
-<p class="sub">Sovereign Cross-Border Trade, Incoterms Split Escrow and Tax Compliance (://crestvaultafrica.com)</p>
-</div>
-<div id="gateToast" class="toast hidden"></div>
-<div class="grid-2">
-<div class="card">
-<h2>1. Create Business / Agency / Owner Account</h2>
-<form id="signupForm">
-<div class="row-2">
-<div><label>Jurisdiction</label><select id="regCountry"><option value="UG">Uganda - URA and UNBS/NDA (UGX)</option><option value="KE">Kenya - KRA and KEBS (KES)</option><option value="NG">Nigeria - FIRS and SON/NAFDAC (NGN)</option><option value="ZA">South Africa - SARS and SABS (ZAR)</option><option value="RW">Rwanda - RRA and RSB (RWF)</option><option value="GH">Ghana - GRA and GSA (GHS)</option><option value="AE">UAE - FTA and ESMA (AED)</option><option value="LY">Libya (OFAC Sanctions Test)</option></select></div>
-<div><label>Account Role (All 7 Roles + Level 6 Owner)</label><select id="regRole"><option value="IMPORTER">Importer / Kikuubo Trader</option><option value="EXPORTER">Factory / Agro-Exporter</option><option value="CARRIER">Freight Carrier / Fleet Owner</option><option value="WHOLESALER">Wholesaler / Distributor</option><option value="RETAILER">Retail Shop / Pharmacy</option><option value="AUDITOR">External CPA / Tax Accountant</option><option value="REGULATOR">Regulator (URA / UNBS / NDA)</option><option value="SUPER_ADMIN">Level 6 Platform Owner / Super-Admin</option></select></div>
-</div>
-<div class="row-2">
-<div><label>Full Name</label><input id="regUser" placeholder="e.g. John Doe" required/></div>
-<div><label>URA / National TIN</label><input id="regTin" placeholder="e.g. 1004928172" required/></div>
-</div>
-<div class="row-2">
-<div><label>Company / Agency Name</label><input id="regOrg" placeholder="e.g. Kampala Traders Ltd" required/></div>
-<div><label>Subscription Plan</label><select id="regPlan"><option value="PRO_TRADE">Pro Trade ($49/mo)</option><option value="FREE_STARTER">Free Starter ($0/mo)</option><option value="RETAIL_PRO">Retail Pro ($15/mo)</option><option value="FACTORY_ENTERPRISE">Factory Enterprise ($199/mo)</option></select></div>
-</div>
-<div class="row-2">
-<div><label>UNBS / NDA / Fleet Permit</label><input id="regPermit" placeholder="e.g. UNBS-PVOC-2026-884"/></div>
-<div><label>Super-Admin PIN (Level 6 Owner Only)</label><input id="regPin" type="password" placeholder="CREST2026"/></div>
-</div>
-<button type="submit" class="btn-em btn-full">Provision Non-Custodial Vault and Enter Workspace</button>
-</form>
-</div>
-<div class="card">
-<h2>2. Public Product Authenticity Scanner (Level 1)</h2>
-<form id="publicScanForm">
-<label>Product Serial Code</label><input id="pubSerial" placeholder="e.g. UG-551-0001" required/>
-<label>District / Scan Location</label><input id="pubDistrict" placeholder="e.g. Arua Municipality" required/>
-<button type="submit" class="btn-am btn-full">Verify Serial Authenticity on XRPL</button>
-</form>
-<div id="pubScanResult" class="toast hidden" style="margin-top:12px"></div>
-</div>
-</div>
-</div>
-<div id="workspaceScreen" class="hidden">
-<div class="topbar">
-<div class="top-in">
-<div style="display:flex;align-items:center;gap:10px">
-<img src="/static/logo.png" alt="Logo" style="height:46px;width:auto;object-fit:contain"/>
-<div id="wsCountryBadge" class="pill p-gr">UG</div>
-<div>
-<strong id="wsOrgTitle">Workspace</strong> 
-<span id="wsRoleBadge" class="pill p-sk">Role</span>
-<div id="wsSub" style="font-size:12px;color:var(--mt)">Vault Ready</div>
-</div>
-</div>
-<div style="display:flex;flex-wrap:wrap;gap:8px">
-<span class="pill p-gr" id="fxRateBadge">1 USD = 3,680 UGX</span>
-<button onclick="openDoc('bank-verified-sme-credit-passport','SUMMARY')" class="btn-id btn-sm">Bank Credit Passport</button>
-<button onclick="openDoc('monthly-ura-vat-ledger','SUMMARY')" class="btn-em btn-sm">URA Tax Ledger</button>
-<button onclick="logoutWorkspace()" class="btn-rs btn-sm">Lock and Exit</button>
-</div>
-</div>
-<div class="tabs">
-<button onclick="switchTab('escrow')" id="tab-escrow" class="tab-btn active">1. Incoterms and Split Escrow</button>
-<button onclick="switchTab('freight')" id="tab-freight" class="tab-btn">2. Freight Bidding</button>
-<button onclick="switchTab('invoices')" id="tab-invoices" class="tab-btn">3. EFRIS Invoices</button>
-<button onclick="switchTab('batches')" id="tab-batches" class="tab-btn">4. QR Batch Seal</button>
-<button onclick="switchTab('retail')" id="tab-retail" class="tab-btn">5. Retail POS and 14d Credit</button>
-<button onclick="switchTab('docs')" id="tab-docs" class="tab-btn">6. All 8 Agency Docs</button>
-<button onclick="switchTab('admin')" id="tab-admin" class="tab-btn hidden">7. Level 6 Owner Console</button>
-</div>
-</div>
-<div class="container">
-<div id="wsToast" class="toast hidden"></div>
-<section id="panel-escrow" class="role-panel">
-<div class="grid-2">
-<div class="card">
-<h2>Lock Negotiable Incoterm 3-Bucket Escrow</h2>
-<form id="dealForm">
-<div class="row-2">
-<div><label>Incoterm</label><select id="dlIncoterm"><option value="FOB">FOB (30/70)</option><option value="CIF">CIF (35/65)</option><option value="CIP">CIP (40/60)</option><option value="DAP">DAP (20/80)</option><option value="DDP">DDP (25/75)</option><option value="EXW">EXW (20/80)</option></select></div>
-<div><label>Supplier</label><input id="dlSupplier" value="Shenzhen Solar Tech (China)" required/></div>
-</div>
-<label>Goods and HS Code</label><input id="dlDesc" value="10x 5kW Solar Inverters (HS 8504.40)" required/>
-<div class="row-3">
-<div><label>Goods ($)</label><input id="dlGoods" type="number" value="16000" required/></div>
-<div><label>Freight ($)</label><input id="dlFreight" type="number" value="2200" required/></div>
-<div><label>Insurance ($)</label><input id="dlIns" type="number" value="150" required/></div>
-</div>
-<div class="row-2">
-<div><label>Split M1 (%)</label><input id="dlSplit1" type="number" value="30" required/></div>
-<div><label>Split M2 (%)</label><input id="dlSplit2" type="number" value="70" required/></div>
-</div>
-<button type="submit" class="btn-em btn-full">Lock 3-Bucket Split Escrow on XRPL</button>
-</form>
-</div>
-<div class="card">
-<h2>Active Shipments (Importer-Only Releases)</h2>
-<div id="dealList">No escrow shipments yet.</div>
-</div>
-</div>
-</section>
-<section id="panel-freight" class="role-panel hidden">
-<div class="card">
-<h2>Freight Carrier Direct Bid (Zero Brokers)</h2>
-<form id="bidForm">
-<input id="bdDealId" placeholder="Shipment ID e.g. ESC-UG-12345" required/>
-<input id="bdPlate" placeholder="Truck Plate e.g. UBF 492K" style="margin-top:8px" required/>
-<input id="bdSeal" placeholder="RECTS Seal e.g. RECTS-UG-99410" style="margin-top:8px" required/>
-<input id="bdUsd" type="number" placeholder="Bid Amount ($)" style="margin-top:8px" required/>
-<button type="submit" class="btn-sk btn-full">Submit Direct Carrier Bid</button>
-</form>
-<div id="bidList" style="margin-top:12px"></div>
-</div>
-</section>
-<section id="panel-invoices" class="role-panel hidden">
-<div class="card">
-<h2>Create URA EFRIS Smart Invoice</h2>
-<form id="invForm">
-<select id="ivFlow">
-<option value="EXPORT">Cross-Border Export (0% Zero-Rated VAT)</option>
-<option value="DOMESTIC">Domestic Sale (Local VAT Applied)</option>
-</select>
-<input id="ivBuyer" placeholder="Buyer Name e.g. Al-Noor Roasters (Dubai)" style="margin-top:8px" required/>
-<input id="ivUsd" type="number" placeholder="Amount ($)" style="margin-top:8px" required/>
-<input id="ivDesc" placeholder="Goods Description" style="margin-top:8px" required/>
-<button type="submit" class="btn-em btn-full">Issue EFRIS Invoice on XRPL</button>
-</form>
-<div id="invList" style="margin-top:12px"></div>
-</div>
-</section>
-<section id="panel-batches" class="role-panel hidden">
-<div class="card">
-<h2>Seal Production Batch (UNBS / NDA)</h2>
-<form id="bchForm">
-<select id="bcAgency">
-<option value="UNBS">UNBS (Q-Mark / PVoC)</option>
-<option value="NDA">NDA (National Drug Authority)</option>
-</select>
-<input id="bcPermit" placeholder="Permit Number e.g. UNBS-QM-2026-8821" style="margin-top:8px" required/>
-<input id="bcCode" placeholder="Batch Code e.g. UG-551" style="margin-top:8px" required/>
-<input id="bcProd" placeholder="Product Name e.g. Pediatric Cough Syrup" style="margin-top:8px" required/>
-<button type="submit" class="btn-em btn-full">Anchor Batch on XRPL</button>
-</form>
-<div id="bchList" style="margin-top:12px"></div>
-<div id="alertList" style="margin-top:12px"></div>
-</div>
-</section>
-<section id="panel-retail" class="role-panel hidden">
-<div class="card">
-<h2>Retail Counter POS and 14-Day Supplier Credit (BNPL)</h2>
-<form id="retForm">
-<select id="rtType">
-<option value="REVENUE_COUNTER_SALE">Daily Counter Sale (Cash / MoMo)</option>
-<option value="DEDUCTIBLE_STOCK_EXPENSE">Stock Delivery / Expense Receipt</option>
-</select>
-<select id="rtBnpl" style="margin-top:8px">
-<option value="false">Paid Immediately</option>
-<option value="true">14-Day Tracked Credit (BNPL)</option>
-</select>
-<input id="rtDesc" placeholder="Item Description" style="margin-top:8px" required/>
-<input id="rtAmt" type="number" placeholder="Amount (Local Currency)" style="margin-top:8px" required/>
-<button type="submit" class="btn-id btn-full">Record Immutable Ledger Entry</button>
-</form>
-<div id="taxList" style="margin-top:12px"></div>
-</div>
-</section>
-<section id="panel-docs" class="role-panel hidden">
-<div class="card">
-<h2>All 8 Agency-Standard Printable Documents</h2>
-<div class="grid-2">
-<button onclick="openDoc('ura-efris-commercial-invoice',lastInvId)" class="btn-em">1. URA EFRIS Commercial Invoice</button>
-<button onclick="openDoc('asycuda-customs-valuation-prn-pack',lastDealId)" class="btn-sk">2. ASYCUDA Customs Valuation and PRN Pack</button>
-<button onclick="openDoc('unbs-nda-conformity-certificate',lastBchId)" class="btn-id">3. UNBS / NDA Conformity Certificate</button>
-<button onclick="openDoc('master-bill-of-lading-packing-list',lastDealId)" class="btn-am">4. Master Bill of Lading and Packing List</button>
-<button onclick="openDoc('eac-afcfta-certificate-of-origin',lastInvId)" class="btn-em">5. EAC / AfCFTA Certificate of Origin</button>
-<button onclick="openDoc('cargo-insurance-certificate',lastDealId)" class="btn-sk">6. Cargo Insurance Certificate (CIF/CIP)</button>
-<button onclick="openDoc('monthly-ura-vat-ledger','SUMMARY')" class="btn-id">7. Monthly URA Input/Output VAT Ledger</button>
-<button onclick="openDoc('bank-verified-sme-credit-passport','SUMMARY')" class="btn-am">8. 6-Month Bank SME Credit Passport</button>
-</div>
-</div>
-</section>
-<section id="panel-admin" class="role-panel hidden">
-<div class="grid-2">
-<div class="card">
-<h2>Level 6 Owner Pricing and API Socket Manager</h2>
-<div class="row-2">
-<div><label>Retail Pro ($/mo)</label><input id="adRetail" type="number" step="0.01"/></div>
-<div><label>Pro Trade ($/mo)</label><input id="adPro" type="number" step="0.01"/></div>
-</div>
-<div class="row-2">
-<div><label>Enterprise ($/mo)</label><input id="adEnt" type="number" step="0.01"/></div>
-<div><label>Off-Ramp Spread (%)</label><input id="adSpread" type="number" step="0.01"/></div>
-</div>
-<div class="row-2">
-<div><label>Atomic XRPL Fee (%)</label><input id="adAtomic" type="number" step="0.01"/></div>
-<div><label>Importer Escrow Fee ($)</label><input id="adEscrow" type="number" step="0.01"/></div>
-</div>
-<div id="socketList" style="margin-top:10px"></div>
-<button onclick="saveAdminConfig()" class="btn-em btn-full">Save Pricing and API Sockets</button>
-</div>
-<div class="card">
-<h2>Corporate XRPL Fee Wallet and Live Revenue</h2>
-<div id="corpWalletBox" class="pill p-gr" style="margin-bottom:10px">Corporate Wallet</div>
-<div id="revList"></div>
-</div>
-</div>
-</section>
-</div>
-</div>
-<script>
-var lt = "<";
-var gt = ">";
-var currentSession=null,lastDealId="SUMMARY",lastInvId="SUMMARY",lastBchId="SUMMARY",currentSockets={};
-function showToast(id,m,e){var el=document.getElementById(id);if(!el)return;el.textContent=m;el.className="toast "+(e?"toast-err":"toast-ok");el.classList.remove("hidden");}
-function authHeaders(){return{"Content-Type":"application/json","X-Session-Token":currentSession?currentSession.token:""};}
-function switchTab(t){document.querySelectorAll(".role-panel").forEach(function(x){x.classList.add("hidden")});document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active")});document.getElementById("panel-"+t).classList.remove("hidden");document.getElementById("tab-"+t).classList.add("active");}
-function logoutWorkspace(){currentSession=null;document.getElementById("workspaceScreen").classList.add("hidden");document.getElementById("gateScreen").classList.remove("hidden");}
-function openDoc(t,r){if(currentSession)window.open("/api/docs/"+t+"/"+encodeURIComponent(r)+"?token="+encodeURIComponent(currentSession.token),"_blank");}
-document.getElementById("signupForm").onsubmit=async function(e){e.preventDefault();var r=await fetch("/api/auth/signup",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({countryCode:document.getElementById("regCountry").value,userRole:document.getElementById("regRole").value,planTier:document.getElementById("regPlan").value,userName:document.getElementById("regUser").value,taxIdTin:document.getElementById("regTin").value,orgName:document.getElementById("regOrg").value,permitNumber:document.getElementById("regPermit").value,adminPin:document.getElementById("regPin").value})});var d=await r.json();if(!r.ok)return showToast("gateToast",d.detail||"Denied",true);currentSession=d.session;currentSession.token=d.token;document.getElementById("gateScreen").classList.add("hidden");document.getElementById("workspaceScreen").classList.remove("hidden");document.getElementById("wsCountryBadge").textContent=currentSession.countryCode;document.getElementById("wsOrgTitle").textContent=currentSession.orgName+" ("+currentSession.userName+")";document.getElementById("wsRoleBadge").textContent=currentSession.roleTitle;document.getElementById("wsSub").textContent="Vault: "+currentSession.xrplVault.slice(0,14)+"... - TIN: "+currentSession.taxIdTin;if(currentSession.userRole==="SUPER_ADMIN"){document.getElementById("tab-admin").classList.remove("hidden");switchTab("admin");}else{document.getElementById("tab-admin").classList.add("hidden");switchTab("escrow");}refreshWorkspace();};
-document.getElementById("publicScanForm").onsubmit=async function(e){e.preventDefault();var sc=document.getElementById("pubSerial").value.trim(),dist=document.getElementById("pubDistrict").value;var r=await fetch("/api/public/verify/"+encodeURIComponent(sc),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({district:dist})});var d=await r.json();var box=document.getElementById("pubScanResult");box.className="toast "+(d.authentic?"toast-ok":"toast-err");box.classList.remove("hidden");box.textContent=(d.status||"ERROR")+": "+(d.message||d.detail||"");};
-async function refreshWorkspace(){if(!currentSession)return;var r=await fetch("/api/workspace",{headers:authHeaders()});var d=await r.json();if(!r.ok)return;document.getElementById("fxRateBadge").textContent="1 USD = "+d.fxRate.toLocaleString()+" "+d.countryProfile.currency;if(d.escrowDeals.length){lastDealId=d.escrowDeals[d.escrowDeals.length-1].id;var bd=document.getElementById("bdDealId");if(bd&&!bd.value)bd.value=lastDealId;}if(d.invoices.length)lastInvId=d.invoices[d.invoices.length-1].id;if(d.batches.length)lastBchId=d.batches[d.batches.length-1].id;var dl=document.getElementById("dealList");dl.innerHTML="";if(!d.escrowDeals.length)dl.textContent="No escrow shipments yet.";d.escrowDeals.forEach(function(x){var c=document.createElement("div");c.className="sub-card";c.innerHTML=lt+"div"+gt+lt+"strong"+gt+x.id+lt+"/strong"+gt+" ["+x.incoterm+"] "+x.productDesc+" - Stage: "+x.stage+" - Carrier: "+x.carrierAwarded+lt+"/div"+gt;var b=document.createElement("div");if(!x.m1Released)b.innerHTML+=lt+"button onclick=relBucket('"+x.id+"','m1') class=btn-em"+gt+"Pay M1 ("+x.splitPct1+"%)"+lt+"/button"+gt+" ";if(!x.customsPaid)b.innerHTML+=lt+"button onclick=payPrn('"+x.id+"') class=btn-am"+gt+"Pay URA PRN"+lt+"/button"+gt+" ";if(!x.freightReleased)b.innerHTML+=lt+"button onclick=relBucket('"+x.id+"','freight') class=btn-sk"+gt+"Pay Carrier"+lt+"/button"+gt+" ";if(!x.m2Released)b.innerHTML+=lt+"button onclick=relBucket('"+x.id+"','m2') class=btn-id"+gt+"Pay M2 ("+x.splitPct2+"%)"+lt+"/button"+gt+" ";b.innerHTML+=lt+"button onclick=openDoc('asycuda-customs-valuation-prn-pack','"+x.id+"') class=btn-sm"+gt+"Print Pack"+lt+"/button"+gt;c.appendChild(b);dl.appendChild(c);});var il=document.getElementById("invList");il.innerHTML="";d.invoices.forEach(function(i){var c=document.createElement("div");c.className="sub-card";c.innerHTML=lt+"div"+gt+lt+"strong"+gt+i.id+lt+"/strong"+gt+" ("+i.efrisFdn+") - "+i.buyerName+" - $"+i.amountUsd+lt+"/div"+gt+lt+"button onclick=openDoc('ura-efris-commercial-invoice','"+i.id+"') class=btn-em"+gt+"Print Invoice"+lt+"/button"+gt;il.appendChild(c);});var bl=document.getElementById("bchList");bl.innerHTML="";d.batches.forEach(function(b){var c=document.createElement("div");c.className="sub-card";c.innerHTML=lt+"div"+gt+lt+"strong"+gt+b.productName+lt+"/strong"+gt+" (Batch: "+b.batchCode+" - "+b.agency+" "+b.permitNo+")"+lt+"/div"+gt+lt+"button onclick=openDoc('unbs-nda-conformity-certificate','"+b.id+"') class=btn-id"+gt+"Print Cert"+lt+"/button"+gt;bl.appendChild(c);});var fl=document.getElementById("bidList");fl.innerHTML="";d.freightBids.forEach(function(f){var c=document.createElement("div");c.className="sub-card";c.textContent=f.dealId+" - "+f.carrierName+" ("+f.truckPlate+") - $"+f.bidUsd+" - Seal: "+f.rectsSealId;fl.appendChild(c);});var tl=document.getElementById("taxList");tl.innerHTML="";d.taxLedger.forEach(function(t){var c=document.createElement("div");c.className="sub-card";c.textContent=t.entryType+" - "+t.referenceId+" - "+Number(t.localAmount).toLocaleString()+" "+t.currency;tl.appendChild(c);});if(currentSession.userRole==="SUPER_ADMIN"){document.getElementById("corpWalletBox").textContent="Corporate XRPL Wallet: "+d.corporateFeeWallet;document.getElementById("adRetail").value=d.pricing.retailProUsd;document.getElementById("adPro").value=d.pricing.proTradeUsd;document.getElementById("adEnt").value=d.pricing.factoryEnterpriseUsd;document.getElementById("adSpread").value=d.pricing.offrampSpreadPct;document.getElementById("adAtomic").value=d.pricing.atomicSettlementFeePct;document.getElementById("adEscrow").value=d.pricing.importerEscrowFlatUsd;currentSockets=d.sockets;var sl=document.getElementById("socketList");sl.innerHTML="";Object.keys(d.sockets).forEach(function(k){var v=d.sockets[k],c=document.createElement("div");c.className="sub-card";c.innerHTML=lt+"div"+gt+lt+"strong"+gt+v.name+lt+"/strong"+gt+" ("+v.mode+")"+lt+"/div"+gt+lt+"input id=sock-"+k+" value="+v.apiKey+" style=max-width:200px/"+gt;sl.appendChild(c);});var rl=document.getElementById("revList");rl.innerHTML="";d.corporateRevenue.forEach(function(rv){var c=document.createElement("div");c.className="sub-card";c.textContent=rv.feeType+" ("+rv.referenceId+") - +$"+rv.amountUsd;rl.appendChild(c);});}}
-async function relBucket(id,b){var r=await fetch("/api/deals/"+id+"/release/"+b,{method:"POST",headers:authHeaders()});if(r.ok){showToast("wsToast","Importer Released "+b.toUpperCase());refreshWorkspace();}}
-async function payPrn(id){var prn=prompt("Enter 13-Digit URA PRN:","2260004918271");if(!prn)return;var r=await fetch("/api/deals/"+id+"/verify-prn",{method:"POST",headers:authHeaders(),body:JSON.stringify({prnNumber:prn})});if(r.ok){showToast("wsToast","Official URA PRN Paid Directly!");refreshWorkspace();}}
-async function saveAdminConfig(){var socks={};Object.keys(currentSockets).forEach(function(k){socks[k]={apiKey:document.getElementById("sock-"+k).value,mode:"LIVE"};});var r=await fetch("/api/admin/config",{method:"POST",headers:authHeaders(),body:JSON.stringify({pricing:{retailProUsd:parseFloat(document.getElementById("adRetail").value),proTradeUsd:parseFloat(document.getElementById("adPro").value),factoryEnterpriseUsd:parseFloat(document.getElementById("adEnt").value),offrampSpreadPct:parseFloat(document.getElementById("adSpread").value),atomicSettlementFeePct:parseFloat(document.getElementById("adAtomic").value),importerEscrowFlatUsd:parseFloat(document.getElementById("adEscrow").value)},sockets:socks})});if(r.ok){showToast("wsToast","Pricing and API Sockets Updated!");refreshWorkspace();}}
-document.getElementById("dealForm").onsubmit=async function(e){e.preventDefault();showToast("wsToast","Locking 3-Bucket Split Escrow on XRPL...");var r=await fetch("/api/deals",{method:"POST",headers:authHeaders(),body:JSON.stringify({countryCode:currentSession.countryCode,incoterm:document.getElementById("dlIncoterm").value,supplierName:document.getElementById("dlSupplier").value,productDesc:document.getElementById("dlDesc").value,goodsUsd:parseFloat(document.getElementById("dlGoods").value),freightUsd:parseFloat(document.getElementById("dlFreight").value),insuranceUsd:parseFloat(document.getElementById("dlIns").value),splitPct1:parseInt(document.getElementById("dlSplit1").value,10),splitPct2:parseInt(document.getElementById("dlSplit2").value,10)})});var d=await r.json();if(!r.ok)return showToast("wsToast",d.detail||"Error",true);showToast("wsToast","Locked Split Escrow: "+d.deal.id);refreshWorkspace();};
-document.getElementById("bidForm").onsubmit=async function(e){e.preventDefault();var r=await fetch("/api/freight/bid",{method:"POST",headers:authHeaders(),body:JSON.stringify({dealId:document.getElementById("bdDealId").value.trim(),truckPlate:document.getElementById("bdPlate").value,rectsSealId:document.getElementById("bdSeal").value,bidUsd:parseFloat(document.getElementById("bdUsd").value)})});var d=await r.json();if(!r.ok)return showToast("wsToast",d.detail||"Enter valid Shipment ID",true);showToast("wsToast","Carrier Bid Awarded!");refreshWorkspace();};
-document.getElementById("invForm").onsubmit=async function(e){e.preventDefault();var r=await fetch("/api/invoices",{method:"POST",headers:authHeaders(),body:JSON.stringify({countryCode:currentSession.countryCode,flowType:document.getElementById("ivFlow").value,buyerName:document.getElementById("ivBuyer").value,amountUsd:parseFloat(document.getElementById("ivUsd").value),productDesc:document.getElementById("ivDesc").value})});var d=await r.json();if(r.ok){showToast("wsToast","Issued EFRIS: "+d.invoice.efrisFdn);refreshWorkspace();}};
-document.getElementById("bchForm").onsubmit=async function(e){e.preventDefault();var r=await fetch("/api/batches",{method:"POST",headers:authHeaders(),body:JSON.stringify({countryCode:currentSession.countryCode,agency:document.getElementById("bcAgency").value,permitNo:document.getElementById("bcPermit").value,batchCode:document.getElementById("bcCode").value,expiryDate:"2028-11-30",productName:document.getElementById("bcProd").value,unitCount:4})});if(r.ok){showToast("wsToast","Batch Sealed on XRPL!");refreshWorkspace();}};
-document.getElementById("retForm").onsubmit=async function(e){e.preventDefault();var r=await fetch("/api/retail/entry",{method:"POST",headers:authHeaders(),body:JSON.stringify({countryCode:currentSession.countryCode,entryType:document.getElementById("rtType").value,isCredit14Day:document.getElementById("rtBnpl").value==="true",itemDesc:document.getElementById("rtDesc").value,localAmount:parseFloat(document.getElementById("rtAmt").value)})});if(r.ok){showToast("wsToast","POS Entry Saved!");refreshWorkspace();}};
-</script>
-</body>
-</html>
+  <header>
+    <div class="brand">
+      <img src="/static/logo.png" alt="Crest Vault Africa" onerror="this.style.display='none'" />
+      <div>
+        <h1>CREST VAULT AFRICA</h1>
+        <p>Non-Custodial Sovereign Trade OS • 7-Role Ecosystem • Agency Printable Vault</p>
+      </div>
+    </div>
+    <div>
+      <span class="badge">Direct Bank &amp; Mobile Money Settlement • Zero Custody</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- AUTH & PUBLIC SCANNER VIEW -->
+    <div id="auth-view" class="grid-2">
+      <div class="card">
+        <h2>1. Create Business / Agency / Owner Account</h2>
+        <label>Jurisdiction</label>
+        <select id="signup-country">
+          <option value="UG">Uganda - URA and UNBS/NDA (UGX)</option>
+          <option value="KE">Kenya - KRA and KEBS (KES)</option>
+          <option value="NG">Nigeria - FIRS and SON/NAFDAC (NGN)</option>
+          <option value="ZA">South Africa - SARS and SABS (ZAR)</option>
+          <option value="RW">Rwanda - RRA and RSB (RWF)</option>
+          <option value="GH">Ghana - GRA and GSA (GHS)</option>
+          <option value="AE">UAE - FTA and ESMA (AED)</option>
+          <option value="LY">Libya (OFAC Sanctions Test)</option>
+        </select>
+
+        <label>Account Role (All 7 Roles + Level 6 Owner)</label>
+        <select id="signup-role">
+          <option value="IMPORTER">Importer / Kikuubo Trader</option>
+          <option value="EXPORTER">Factory / Agro-Exporter</option>
+          <option value="CARRIER">Freight Carrier / Fleet Owner</option>
+          <option value="WHOLESALER">Wholesaler / Distributor</option>
+          <option value="RETAILER">Retail Shop / Pharmacy</option>
+          <option value="AUDITOR">External CPA / Tax Accountant</option>
+          <option value="REGULATOR">Government Inspector (URA / UNBS / NDA)</option>
+          <option value="SUPER_ADMIN">Level 6 Platform Owner / Super-Admin</option>
+        </select>
+
+        <label>Full Name</label>
+        <input id="signup-name" placeholder="e.g., Sarah Namukasa" />
+
+        <label>URA / National TIN (or Truck Plate for Carriers)</label>
+        <input id="signup-tin" placeholder="e.g., 1004928172" />
+
+        <label>Company / Agency Name</label>
+        <input id="signup-org" placeholder="e.g., Kampala Solar &amp; Hardware Ltd" />
+
+        <label>Subscription Plan</label>
+        <select id="signup-plan">
+          <option value="PRO_TRADE">Pro Trade ($49/mo)</option>
+          <option value="FREE_STARTER">Free Starter ($0/mo)</option>
+          <option value="RETAIL_PRO">Retail Pro ($15/mo)</option>
+          <option value="FACTORY_ENTERPRISE">Factory Enterprise ($199/mo)</option>
+        </select>
+
+        <label>UNBS / NDA / Fleet Permit (Optional)</label>
+        <input id="signup-permit" placeholder="e.g., UNBS-Q-88412" />
+
+        <label>Super-Admin PIN (Level 6 Owner Only)</label>
+        <input id="signup-pin" type="password" placeholder="Leave blank unless Owner" />
+
+        <button onclick="handleSignup()">Provision Trade Clearing Account &amp; Enter Workspace</button>
+        <div id="signup-msg"></div>
+      </div>
+
+      <div class="card">
+        <h2>2. Public Product Authenticity Scanner (Level 1)</h2>
+        <p style="font-size:0.88rem;color:var(--muted);">Verify UNBS / NDA / SON / KEBS serialized batch codes in real time and detect counterfeit clones across cities.</p>
+        <label>Product Serial Code</label>
+        <input id="scan-serial" placeholder="e.g., BCH-2026-0001" />
+        <label>District / Scan Location</label>
+        <input id="scan-city" value="Kampala" />
+        <button class="secondary" onclick="verifySerial()">Verify Serial Authenticity</button>
+        <div id="scan-result"></div>
+      </div>
+    </div>
+
+    <!-- WORKSPACE VIEW -->
+    <div id="workspace-view" style="display:none;">
+      <div class="topbar">
+        <div>
+          <strong id="ws-org" style="font-size:1.05rem;color:var(--gold);">Workspace</strong>
+          <span class="badge" id="ws-role" style="margin-left:8px;">Role</span>
+          <div style="font-size:0.82rem;color:var(--muted);margin-top:4px;">
+            Clearing Ref: <span class="mono" id="ws-vault">Ready</span> •
+            Rate: <strong id="ws-fx">1 USD = 3,700 UGX</strong>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="sm secondary" onclick="openDoc('bank-credit-passport', 'SUMMARY')">Bank Credit Passport</button>
+          <button class="sm gold" onclick="openDoc('ura-tax-ledger', 'LEDGER')">Tax Ledger</button>
+          <button class="danger" onclick="logout()">Lock &amp; Exit</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tab-escrow', this)">1. Incoterms &amp; Split Escrow</button>
+        <button class="tab-btn" onclick="switchTab('tab-freight', this)">2. Freight Bidding</button>
+        <button class="tab-btn" onclick="switchTab('tab-efris', this)">3. EFRIS Invoices</button>
+        <button class="tab-btn" onclick="switchTab('tab-batch', this)">4. QR Batch Seal</button>
+        <button class="tab-btn" onclick="switchTab('tab-retail', this)">5. Retail POS &amp; 14d Credit</button>
+        <button class="tab-btn" onclick="switchTab('tab-docs', this)">6. All 8 Agency Docs</button>
+        <button class="tab-btn" onclick="switchTab('tab-owner', this)">7. Level 6 Owner &amp; Clearing Engine</button>
+      </div>
+
+      <!-- TAB 1: INCOTERMS ESCROW -->
+      <div id="tab-escrow" class="panel active grid-2">
+        <div class="card">
+          <h2>Lock Negotiable Incoterm 3-Bucket Escrow</h2>
+          <label>Incoterm</label>
+          <select id="deal-incoterm">
+            <option value="FOB">FOB (Free On Board — 30/70)</option>
