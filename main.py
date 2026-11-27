@@ -23,7 +23,6 @@ from pydantic import BaseModel
 
 from xrpl.asyncio.clients import AsyncJsonRpcClient
 from xrpl.asyncio.transaction import autofill as async_autofill
-from xrpl.asyncio.transaction import multisign as async_multisign
 from xrpl.asyncio.transaction import submit_and_wait as async_submit_and_wait
 from xrpl.asyncio.wallet import generate_faucet_wallet
 from xrpl.clients import JsonRpcClient
@@ -43,7 +42,7 @@ from xrpl.models.transactions import (
     TrustSet,
     TrustSetFlag,
 )
-from xrpl.transaction import submit_and_wait
+from xrpl.transaction import multisign, submit_and_wait
 from xrpl.utils import datetime_to_ripple_time, xrp_to_drops
 from xrpl.wallet import Wallet
 
