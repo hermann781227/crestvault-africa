@@ -55,7 +55,7 @@ CORPORATE_FEE_WALLET = os.getenv("CORPORATE_FEE_WALLET", "rCrestVaultAfricaCorpo
 OFFRAMP_HOLDING_ADDRESS = os.getenv("OFFRAMP_HOLDING_ADDRESS", "")
 DB_FILE = "crestvault_v2_db.json"
 
-XRPL_TESTNET_URL = os.getenv("XRPL_RPC_URL", "https://rippletest.net")
+XRPL_TESTNET_URL = os.getenv("XRPL_RPC_URL", "https://xrpl-labs.com")
 LSF_REQUIRE_AUTH = 0x00040000
 LSF_ALLOW_TRUSTLINE_LOCKING = 0x40000000
 ASF_ALLOW_TRUSTLINE_LOCKING = 17
