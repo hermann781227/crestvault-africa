@@ -329,7 +329,7 @@ def sign_multisig_leg(tx_dict: Dict[str, Any], signer: Wallet) -> Payment:
     return Payment.from_xrpl(copy_d)
 
 
-def ensure_master_and_offramp(currency_code: str) -> Dict[str, Any]:
+execute_deal_settlement_fast(currency_code: str) -> Dict[str, Any]:
     """Sets up Master (Flag 17 Issuer/Buyer) + Off-Ramp Partner once using XRPL_MASTER_SEED (no faucet calls)."""
     db = load_db()
     saved = db.get("wallets", {}).get("MASTER_CONFIG")
@@ -674,7 +674,7 @@ def workspace(s: dict = Depends(get_session)):
 
 
 @app.post("/api/deals")
-def create_deal(req: DealCreateReq, s: dict = Depends(get_session)):
+async def create_deal(req: DealCreateReq, s: dict = Depends(get_session)):
     if req.splitPct1 + req.splitPct2 != 100:
         raise HTTPException(status_code=400, detail="Splits must equal 100%")
 
@@ -692,7 +692,7 @@ def create_deal(req: DealCreateReq, s: dict = Depends(get_session)):
     vat = round((cif + duty) * prof["vatRate"], 2)
     customs = round(duty + vat + (cif * prof["infraLevy"]), 2)
 
-    settlement = execute_deal_settlement_fast(
+       settlement = await execute_deal_settlement_async(
         deal_id=did,
         symbol=req.settlementCoin,
         amount_usd=req.goodsUsd,
