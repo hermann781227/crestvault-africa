@@ -1,242 +1,710 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Crest Vault Africa</title>
-<style>:root{--bg:#020617;--card:#0f172a;--in:#1e293b;--bd:#334155;--tx:#f1f5f9;--mt:#94a3b8;--em:#059669;--sk:#0284c7;--am:#d97706;--rs:#e11d48;--id:#4f46e5}*{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--tx);font-family:Segoe UI,Roboto,sans-serif;line-height:1.5}.hidden{display:none!important}.container{max-width:1220px;margin:0 auto;padding:24px 16px}.hero{text-align:center;margin-bottom:24px}.pill-top{display:inline-block;padding:4px 12px;border-radius:99px;background:rgba(16,185,129,.15);border:1px solid #10b981;color:#34d399;font-size:12px;margin-bottom:8px}h1{font-size:26px;font-weight:800;margin-bottom:6px}h2{font-size:16px;margin-bottom:10px}.sub{color:var(--mt);font-size:14px}.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px}.row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px;margin-bottom:16px}.sub-card{background:var(--in);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:10px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}label{display:block;font-size:12px;color:var(--mt);margin:9px 0 4px}input,select{width:100%;background:var(--in);border:1px solid var(--bd);border-radius:8px;padding:9px 11px;color:#fff;font-size:13px}input::placeholder{color:#64748b;font-style:italic}button{cursor:pointer;border:none;border-radius:8px;padding:9px 13px;font-weight:700;font-size:12px;color:#fff}.btn-full{width:100%;margin-top:14px}.btn-em{background:var(--em)}.btn-am{background:var(--am)}.btn-sk{background:var(--sk)}.btn-id{background:var(--id)}.btn-rs{background:var(--rs)}.btn-sm{padding:6px 10px;font-size:11px}.topbar{background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:50}.top-in{max-width:1220px;margin:0 auto;padding:12px 16px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}.tabs{max-width:1220px;margin:0 auto;padding:0 16px 12px;display:flex;flex-wrap:wrap;gap:6px}.tab-btn{background:var(--in);color:#cbd5e1}.tab-btn.active{background:var(--em);color:#fff}.toast{padding:12px;border-radius:10px;margin-bottom:16px;font-size:13px;font-weight:600;border:1px solid}.toast-ok{background:rgba(16,185,129,.15);border-color:#10b981;color:#6ee7b7}.toast-err{background:rgba(225,29,72,.15);border-color:var(--rs);color:#fda4af}.pill{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700}.p-gr{background:rgba(16,185,129,.2);color:#34d399}.p-sk{background:rgba(2,132,199,.25);color:#38bdf8}</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crest Vault Africa | Institutional Trade, Compliance &amp; Clearing OS</title>
+  <style>
+    :root { --emerald: #059669; --emerald-dark: #047857; --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; --text: #0f172a; --muted: #64748b; }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+    .topbar { background: #fff; border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .brand { font-weight: 800; font-size: 18px; color: var(--emerald); display: flex; align-items: center; gap: 8px; }
+    .pill { background: #ecfdf5; color: var(--emerald-dark); padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; border: 1px solid #a7f3d0; }
+    .container { max-width: 1240px; margin: 24px auto; padding: 0 20px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 18px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    @media (max-width: 900px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+    label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 4px; margin-top: 10px; }
+    input, select { width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: #fff; }
+    button { background: var(--emerald); color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 13px; }
+    button:hover { background: var(--emerald-dark); }
+    button.sec { background: #f1f5f9; color: var(--text); border: 1px solid var(--border); }
+    button.sm { padding: 6px 10px; font-size: 12px; }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+    .tab { background: #fff; color: var(--muted); border: 1px solid var(--border); padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 13px; }
+    .tab.active { background: var(--emerald); color: #fff; border-color: var(--emerald); }
+    .hidden { display: none !important; }
+    .kpi { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+    .kpi .v { font-size: 20px; font-weight: 800; color: var(--text); margin-top: 4px; }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+    .b-ok { background: #dcfce7; color: #166534; }
+    .b-warn { background: #fef9c3; color: #854d0e; }
+    .b-err { background: #fee2e2; color: #991b1b; }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: #0f172a; color: #fff; padding: 12px 18px; border-radius: 8px; font-size: 13px; z-index: 999; max-width: 420px; }
+    .deal-box { border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 12px; background: #fcfdfd; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 9px; border-bottom: 1px solid var(--border); text-align: left; }
+    th { background: #f8fafc; color: var(--muted); font-size: 12px; }
+  </style>
 </head>
 <body>
-<div id="gateScreen" class="container">
-<div class="hero">
-<img src="/static/logo.png" alt="Crest Vault Africa" style="width:100%;max-width:440px;max-height:200px;object-fit:contain;margin-bottom:10px"/>
-<br/>
-<div class="pill-top">Non-Custodial XRPL Trade OS - 7-Role Ecosystem - Agency Printable Vault</div>
-<h1>Crest Vault Africa</h1>
-<p class="sub">Sovereign Cross-Border Trade, Incoterms Split Escrow and Tax Compliance (://crestvaultafrica.com)</p>
-</div>
-<div id="gateToast" class="toast hidden"></div>
-<div class="grid-2">
-<div class="card">
-<h2>1. Create Business / Agency / Owner Account</h2>
-<form id="signupForm">
-<div class="row-2">
-<div><label>Jurisdiction</label><select id="regCountry"><option value="UG">Uganda - URA and UNBS/NDA (UGX)</option><option value="KE">Kenya - KRA and KEBS (KES)</option><option value="NG">Nigeria - FIRS and SON/NAFDAC (NGN)</option><option value="ZA">South Africa - SARS and SABS (ZAR)</option><option value="RW">Rwanda - RRA and RSB (RWF)</option><option value="GH">Ghana - GRA and GSA (GHS)</option><option value="AE">UAE - FTA and ESMA (AED)</option><option value="LY">Libya (OFAC Sanctions Test)</option></select></div>
-<div><label>Account Role (All 7 Roles + Level 6 Owner)</label><select id="regRole"><option value="IMPORTER">Importer / Kikuubo Trader</option><option value="EXPORTER">Factory / Agro-Exporter</option><option value="CARRIER">Freight Carrier / Fleet Owner</option><option value="WHOLESALER">Wholesaler / Distributor</option><option value="RETAILER">Retail Shop / Pharmacy</option><option value="AUDITOR">External CPA / Tax Accountant</option><option value="REGULATOR">Regulator (URA / UNBS / NDA)</option><option value="SUPER_ADMIN">Level 6 Platform Owner / Super-Admin</option></select></div>
-</div>
-<div class="row-2">
-<div><label>Full Name</label><input id="regUser" placeholder="e.g. John Doe" required/></div>
-<div><label>URA / National TIN</label><input id="regTin" placeholder="e.g. 1004928172" required/></div>
-</div>
-<div class="row-2">
-<div><label>Company / Agency Name</label><input id="regOrg" placeholder="e.g. Kampala Traders Ltd" required/></div>
-<div><label>Subscription Plan</label><select id="regPlan"><option value="PRO_TRADE">Pro Trade ($49/mo)</option><option value="FREE_STARTER">Free Starter ($0/mo)</option><option value="RETAIL_PRO">Retail Pro ($15/mo)</option><option value="FACTORY_ENTERPRISE">Factory Enterprise ($199/mo)</option></select></div>
-</div>
-<div class="row-2">
-<div><label>UNBS / NDA / Fleet Permit</label><input id="regPermit" placeholder="e.g. UNBS-PVOC-2026-884"/></div>
-<div><label>Super-Admin PIN (Level 6 Owner Only)</label><input id="regPin" type="password" placeholder="CREST2026"/></div>
-</div>
-<button type="submit" class="btn-em btn-full">Provision Non-Custodial Vault and Enter Workspace</button>
-</form>
-</div>
-<div class="card">
-<h2>2. Public Product Authenticity Scanner (Level 1)</h2>
-<form id="publicScanForm">
-<label>Product Serial Code</label><input id="pubSerial" placeholder="e.g. UG-551-0001" required/>
-<label>District / Scan Location</label><input id="pubDistrict" placeholder="e.g. Arua Municipality" required/>
-<button type="submit" class="btn-am btn-full">Verify Serial Authenticity on XRPL</button>
-</form>
-<div id="pubScanResult" class="toast hidden" style="margin-top:12px"></div>
-</div>
-</div>
-</div>
-<div id="workspaceScreen" class="hidden">
-<div class="topbar">
-<div class="top-in">
-<div style="display:flex;align-items:center;gap:10px">
-<img src="/static/logo.png" alt="Logo" style="height:46px;width:auto;object-fit:contain"/>
-<div id="wsCountryBadge" class="pill p-gr">UG</div>
-<div>
-<strong id="wsOrgTitle">Workspace</strong> 
-<span id="wsRoleBadge" class="pill p-sk">Role</span>
-<div id="wsSub" style="font-size:12px;color:var(--mt)">Vault Ready</div>
-</div>
-</div>
-<div style="display:flex;flex-wrap:wrap;gap:8px">
-<span class="pill p-gr" id="fxRateBadge">1 USD = 3,680 UGX</span>
-<button onclick="openDoc('bank-verified-sme-credit-passport','SUMMARY')" class="btn-id btn-sm">Bank Credit Passport</button>
-<button onclick="openDoc('monthly-ura-vat-ledger','SUMMARY')" class="btn-em btn-sm">URA Tax Ledger</button>
-<button onclick="logoutWorkspace()" class="btn-rs btn-sm">Lock and Exit</button>
-</div>
-</div>
-<div class="tabs">
-<button onclick="switchTab('escrow')" id="tab-escrow" class="tab-btn active">1. Incoterms and Split Escrow</button>
-<button onclick="switchTab('freight')" id="tab-freight" class="tab-btn">2. Freight Bidding</button>
-<button onclick="switchTab('invoices')" id="tab-invoices" class="tab-btn">3. EFRIS Invoices</button>
-<button onclick="switchTab('batches')" id="tab-batches" class="tab-btn">4. QR Batch Seal</button>
-<button onclick="switchTab('retail')" id="tab-retail" class="tab-btn">5. Retail POS and 14d Credit</button>
-<button onclick="switchTab('docs')" id="tab-docs" class="tab-btn">6. All 8 Agency Docs</button>
-<button onclick="switchTab('admin')" id="tab-admin" class="tab-btn hidden">7. Level 6 Owner Console</button>
-</div>
-</div>
-<div class="container">
-<div id="wsToast" class="toast hidden"></div>
-<section id="panel-escrow" class="role-panel">
-<div class="grid-2">
-<div class="card">
-<h2>Lock Negotiable Incoterm 3-Bucket Escrow</h2>
-<form id="dealForm">
-<div class="row-2">
-<div><label>Incoterm</label><select id="dlIncoterm"><option value="FOB">FOB (30/70)</option><option value="CIF">CIF (35/65)</option><option value="CIP">CIP (40/60)</option><option value="DAP">DAP (20/80)</option><option value="DDP">DDP (25/75)</option><option value="EXW">EXW (20/80)</option></select></div>
-<div><label>Supplier</label><input id="dlSupplier" value="Shenzhen Solar Tech (China)" required/></div>
-</div>
-<label>Goods and HS Code</label><input id="dlDesc" value="10x 5kW Solar Inverters (HS 8504.40)" required/>
-<div class="row-3">
-<div><label>Goods ($)</label><input id="dlGoods" type="number" value="16000" required/></div>
-<div><label>Freight ($)</label><input id="dlFreight" type="number" value="2200" required/></div>
-<div><label>Insurance ($)</label><input id="dlIns" type="number" value="150" required/></div>
-</div>
-<div class="row-2">
-<div><label>Split M1 (%)</label><input id="dlSplit1" type="number" value="30" required/></div>
-<div><label>Split M2 (%)</label><input id="dlSplit2" type="number" value="70" required/></div>
-</div>
-<button type="submit" class="btn-em btn-full">Lock 3-Bucket Split Escrow on XRPL</button>
-</form>
-</div>
-<div class="card">
-<h2>Active Shipments (Importer-Only Releases)</h2>
-<div id="dealList">No escrow shipments yet.</div>
-</div>
-</div>
-</section>
-<section id="panel-freight" class="role-panel hidden">
-<div class="card">
-<h2>Freight Carrier Direct Bid (Zero Brokers)</h2>
-<form id="bidForm">
-<input id="bdDealId" placeholder="Shipment ID e.g. ESC-UG-12345" required/>
-<input id="bdPlate" placeholder="Truck Plate e.g. UBF 492K" style="margin-top:8px" required/>
-<input id="bdSeal" placeholder="RECTS Seal e.g. RECTS-UG-99410" style="margin-top:8px" required/>
-<input id="bdUsd" type="number" placeholder="Bid Amount ($)" style="margin-top:8px" required/>
-<button type="submit" class="btn-sk btn-full">Submit Direct Carrier Bid</button>
-</form>
-<div id="bidList" style="margin-top:12px"></div>
-</div>
-</section>
-<section id="panel-invoices" class="role-panel hidden">
-<div class="card">
-<h2>Create URA EFRIS Smart Invoice</h2>
-<form id="invForm">
-<select id="ivFlow">
-<option value="EXPORT">Cross-Border Export (0% Zero-Rated VAT)</option>
-<option value="DOMESTIC">Domestic Sale (Local VAT Applied)</option>
-</select>
-<input id="ivBuyer" placeholder="Buyer Name e.g. Al-Noor Roasters (Dubai)" style="margin-top:8px" required/>
-<input id="ivUsd" type="number" placeholder="Amount ($)" style="margin-top:8px" required/>
-<input id="ivDesc" placeholder="Goods Description" style="margin-top:8px" required/>
-<button type="submit" class="btn-em btn-full">Issue EFRIS Invoice on XRPL</button>
-</form>
-<div id="invList" style="margin-top:12px"></div>
-</div>
-</section>
-<section id="panel-batches" class="role-panel hidden">
-<div class="card">
-<h2>Seal Production Batch (UNBS / NDA)</h2>
-<form id="bchForm">
-<select id="bcAgency">
-<option value="UNBS">UNBS (Q-Mark / PVoC)</option>
-<option value="NDA">NDA (National Drug Authority)</option>
-</select>
-<input id="bcPermit" placeholder="Permit Number e.g. UNBS-QM-2026-8821" style="margin-top:8px" required/>
-<input id="bcCode" placeholder="Batch Code e.g. UG-551" style="margin-top:8px" required/>
-<input id="bcProd" placeholder="Product Name e.g. Pediatric Cough Syrup" style="margin-top:8px" required/>
-<button type="submit" class="btn-em btn-full">Anchor Batch on XRPL</button>
-</form>
-<div id="bchList" style="margin-top:12px"></div>
-<div id="alertList" style="margin-top:12px"></div>
-</div>
-</section>
-<section id="panel-retail" class="role-panel hidden">
-<div class="card">
-<h2>Retail Counter POS and 14-Day Supplier Credit (BNPL)</h2>
-<form id="retForm">
-<select id="rtType">
-<option value="REVENUE_COUNTER_SALE">Daily Counter Sale (Cash / MoMo)</option>
-<option value="DEDUCTIBLE_STOCK_EXPENSE">Stock Delivery / Expense Receipt</option>
-</select>
-<select id="rtBnpl" style="margin-top:8px">
-<option value="false">Paid Immediately</option>
-<option value="true">14-Day Tracked Credit (BNPL)</option>
-</select>
-<input id="rtDesc" placeholder="Item Description" style="margin-top:8px" required/>
-<input id="rtAmt" type="number" placeholder="Amount (Local Currency)" style="margin-top:8px" required/>
-<button type="submit" class="btn-id btn-full">Record Immutable Ledger Entry</button>
-</form>
-<div id="taxList" style="margin-top:12px"></div>
-</div>
-</section>
-<section id="panel-docs" class="role-panel hidden">
-<div class="card">
-<h2>All 8 Agency-Standard Printable Documents</h2>
-<div class="grid-2">
-<button onclick="openDoc('ura-efris-commercial-invoice',lastInvId)" class="btn-em">1. URA EFRIS Commercial Invoice</button>
-<button onclick="openDoc('asycuda-customs-valuation-prn-pack',lastDealId)" class="btn-sk">2. ASYCUDA Customs Valuation and PRN Pack</button>
-<button onclick="openDoc('unbs-nda-conformity-certificate',lastBchId)" class="btn-id">3. UNBS / NDA Conformity Certificate</button>
-<button onclick="openDoc('master-bill-of-lading-packing-list',lastDealId)" class="btn-am">4. Master Bill of Lading and Packing List</button>
-<button onclick="openDoc('eac-afcfta-certificate-of-origin',lastInvId)" class="btn-em">5. EAC / AfCFTA Certificate of Origin</button>
-<button onclick="openDoc('cargo-insurance-certificate',lastDealId)" class="btn-sk">6. Cargo Insurance Certificate (CIF/CIP)</button>
-<button onclick="openDoc('monthly-ura-vat-ledger','SUMMARY')" class="btn-id">7. Monthly URA Input/Output VAT Ledger</button>
-<button onclick="openDoc('bank-verified-sme-credit-passport','SUMMARY')" class="btn-am">8. 6-Month Bank SME Credit Passport</button>
-</div>
-</div>
-</section>
-<section id="panel-admin" class="role-panel hidden">
-<div class="grid-2">
-<div class="card">
-<h2>Level 6 Owner Pricing and API Socket Manager</h2>
-<div class="row-2">
-<div><label>Retail Pro ($/mo)</label><input id="adRetail" type="number" step="0.01"/></div>
-<div><label>Pro Trade ($/mo)</label><input id="adPro" type="number" step="0.01"/></div>
-</div>
-<div class="row-2">
-<div><label>Enterprise ($/mo)</label><input id="adEnt" type="number" step="0.01"/></div>
-<div><label>Off-Ramp Spread (%)</label><input id="adSpread" type="number" step="0.01"/></div>
-</div>
-<div class="row-2">
-<div><label>Atomic XRPL Fee (%)</label><input id="adAtomic" type="number" step="0.01"/></div>
-<div><label>Importer Escrow Fee ($)</label><input id="adEscrow" type="number" step="0.01"/></div>
-</div>
-<div id="socketList" style="margin-top:10px"></div>
-<button onclick="saveAdminConfig()" class="btn-em btn-full">Save Pricing and API Sockets</button>
-</div>
-<div class="card">
-<h2>Corporate XRPL Fee Wallet and Live Revenue</h2>
-<div id="corpWalletBox" class="pill p-gr" style="margin-bottom:10px">Corporate Wallet</div>
-<div id="revList"></div>
-</div>
-</div>
-</section>
-</div>
-</div>
-<script>
-var lt = "<";
-var gt = ">";
-var currentSession=null,lastDealId="SUMMARY",lastInvId="SUMMARY",lastBchId="SUMMARY",currentSockets={};
-function showToast(id,m,e){var el=document.getElementById(id);if(!el)return;el.textContent=m;el.className="toast "+(e?"toast-err":"toast-ok");el.classList.remove("hidden");}
-function authHeaders(){return{"Content-Type":"application/json","X-Session-Token":currentSession?currentSession.token:""};}
-function switchTab(t){document.querySelectorAll(".role-panel").forEach(function(x){x.classList.add("hidden")});document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active")});document.getElementById("panel-"+t).classList.remove("hidden");document.getElementById("tab-"+t).classList.add("active");}
-function logoutWorkspace(){currentSession=null;document.getElementById("workspaceScreen").classList.add("hidden");document.getElementById("gateScreen").classList.remove("hidden");}
-function openDoc(t,r){if(currentSession)window.open("/api/docs/"+t+"/"+encodeURIComponent(r)+"?token="+encodeURIComponent(currentSession.token),"_blank");}
-document.getElementById("signupForm").onsubmit=async function(e){e.preventDefault();var r=await fetch("/api/auth/signup",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({countryCode:document.getElementById("regCountry").value,userRole:document.getElementById("regRole").value,planTier:document.getElementById("regPlan").value,userName:document.getElementById("regUser").value,taxIdTin:document.getElementById("regTin").value,orgName:document.getElementById("regOrg").value,permitNumber:document.getElementById("regPermit").value,adminPin:document.getElementById("regPin").value})});var d=await r.json();if(!r.ok)return showToast("gateToast",d.detail||"Denied",true);currentSession=d.session;currentSession.token=d.token;document.getElementById("gateScreen").classList.add("hidden");document.getElementById("workspaceScreen").classList.remove("hidden");document.getElementById("wsCountryBadge").textContent=currentSession.countryCode;document.getElementById("wsOrgTitle").textContent=currentSession.orgName+" ("+currentSession.userName+")";document.getElementById("wsRoleBadge").textContent=currentSession.roleTitle;document.getElementById("wsSub").textContent="Vault: "+currentSession.xrplVault.slice(0,14)+"... - TIN: "+currentSession.taxIdTin;if(currentSession.userRole==="SUPER_ADMIN"){document.getElementById("tab-admin").classList.remove("hidden");switchTab("admin");}else{document.getElementById("tab-admin").classList.add("hidden");switchTab("escrow");}refreshWorkspace();};
-document.getElementById("publicScanForm").onsubmit=async function(e){e.preventDefault();var sc=document.getElementById("pubSerial").value.trim(),dist=document.getElementById("pubDistrict").value;var r=await fetch("/api/public/verify/"+encodeURIComponent(sc),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({district:dist})});var d=await r.json();var box=document.getElementById("pubScanResult");box.className="toast "+(d.authentic?"toast-ok":"toast-err");box.classList.remove("hidden");box.textContent=(d.status||"ERROR")+": "+(d.message||d.detail||"");};
-async function refreshWorkspace(){if(!currentSession)return;var r=await fetch("/api/workspace",{headers:authHeaders()});var d=await r.json();if(!r.ok)return;document.getElementById("fxRateBadge").textContent="1 USD = "+d.fxRate.toLocaleString()+" "+d.countryProfile.currency;if(d.escrowDeals.length){lastDealId=d.escrowDeals[d.escrowDeals.length-1].id;var bd=document.getElementById("bdDealId");if(bd&&!bd.value)bd.value=lastDealId;}if(d.invoices.length)lastInvId=d.invoices[d.invoices.length-1].id;if(d.batches.length)lastBchId=d.batches[d.batches.length-1].id;var dl=document.getElementById("dealList");dl.innerHTML="";if(!d.escrowDeals.length)dl.textContent="No escrow shipments yet.";d.escrowDeals.forEach(function(x){var c=document.createElement("div");c.className="sub-card";c.innerHTML=lt+"div"+gt+lt+"strong"+gt+x.id+lt+"/strong"+gt+" ["+x.incoterm+"] "+x.productDesc+" - Stage: "+x.stage+" - Carrier: "+x.carrierAwarded+lt+"/div"+gt;var b=document.createElement("div");if(!x.m1Released)b.innerHTML+=lt+"button onclick=relBucket('"+x.id+"','m1') class=btn-em"+gt+"Pay M1 ("+x.splitPct1+"%)"+lt+"/button"+gt+" ";if(!x.customsPaid)b.innerHTML+=lt+"button onclick=payPrn('"+x.id+"') class=btn-am"+gt+"Pay URA PRN"+lt+"/button"+gt+" ";if(!x.freightReleased)b.innerHTML+=lt+"button onclick=relBucket('"+x.id+"','freight') class=btn-sk"+gt+"Pay Carrier"+lt+"/button"+gt+" ";if(!x.m2Released)b.innerHTML+=lt+"button onclick=relBucket('"+x.id+"','m2') class=btn-id"+gt+"Pay M2 ("+x.splitPct2+"%)"+lt+"/button"+gt+" ";b.innerHTML+=lt+"button onclick=openDoc('asycuda-customs-valuation-prn-pack','"+x.id+"') class=btn-sm"+gt+"Print Pack"+lt+"/button"+gt;c.appendChild(b);dl.appendChild(c);});var il=document.getElementById("invList");il.innerHTML="";d.invoices.forEach(function(i){var c=document.createElement("div");c.className="sub-card";c.innerHTML=lt+"div"+gt+lt+"strong"+gt+i.id+lt+"/strong"+gt+" ("+i.efrisFdn+") - "+i.buyerName+" - $"+i.amountUsd+lt+"/div"+gt+lt+"button onclick=openDoc('ura-efris-commercial-invoice','"+i.id+"') class=btn-em"+gt+"Print Invoice"+lt+"/button"+gt;il.appendChild(c);});var bl=document.getElementById("bchList");bl.innerHTML="";d.batches.forEach(function(b){var c=document.createElement("div");c.className="sub-card";c.innerHTML=lt+"div"+gt+lt+"strong"+gt+b.productName+lt+"/strong"+gt+" (Batch: "+b.batchCode+" - "+b.agency+" "+b.permitNo+")"+lt+"/div"+gt+lt+"button onclick=openDoc('unbs-nda-conformity-certificate','"+b.id+"') class=btn-id"+gt+"Print Cert"+lt+"/button"+gt;bl.appendChild(c);});var fl=document.getElementById("bidList");fl.innerHTML="";d.freightBids.forEach(function(f){var c=document.createElement("div");c.className="sub-card";c.textContent=f.dealId+" - "+f.carrierName+" ("+f.truckPlate+") - $"+f.bidUsd+" - Seal: "+f.rectsSealId;fl.appendChild(c);});var tl=document.getElementById("taxList");tl.innerHTML="";d.taxLedger.forEach(function(t){var c=document.createElement("div");c.className="sub-card";c.textContent=t.entryType+" - "+t.referenceId+" - "+Number(t.localAmount).toLocaleString()+" "+t.currency;tl.appendChild(c);});if(currentSession.userRole==="SUPER_ADMIN"){document.getElementById("corpWalletBox").textContent="Corporate XRPL Wallet: "+d.corporateFeeWallet;document.getElementById("adRetail").value=d.pricing.retailProUsd;document.getElementById("adPro").value=d.pricing.proTradeUsd;document.getElementById("adEnt").value=d.pricing.factoryEnterpriseUsd;document.getElementById("adSpread").value=d.pricing.offrampSpreadPct;document.getElementById("adAtomic").value=d.pricing.atomicSettlementFeePct;document.getElementById("adEscrow").value=d.pricing.importerEscrowFlatUsd;currentSockets=d.sockets;var sl=document.getElementById("socketList");sl.innerHTML="";Object.keys(d.sockets).forEach(function(k){var v=d.sockets[k],c=document.createElement("div");c.className="sub-card";c.innerHTML=lt+"div"+gt+lt+"strong"+gt+v.name+lt+"/strong"+gt+" ("+v.mode+")"+lt+"/div"+gt+lt+"input id=sock-"+k+" value="+v.apiKey+" style=max-width:200px/"+gt;sl.appendChild(c);});var rl=document.getElementById("revList");rl.innerHTML="";d.corporateRevenue.forEach(function(rv){var c=document.createElement("div");c.className="sub-card";c.textContent=rv.feeType+" ("+rv.referenceId+") - +$"+rv.amountUsd;rl.appendChild(c);});}}
-async function relBucket(id,b){var r=await fetch("/api/deals/"+id+"/release/"+b,{method:"POST",headers:authHeaders()});if(r.ok){showToast("wsToast","Importer Released "+b.toUpperCase());refreshWorkspace();}}
-async function payPrn(id){var prn=prompt("Enter 13-Digit URA PRN:","2260004918271");if(!prn)return;var r=await fetch("/api/deals/"+id+"/verify-prn",{method:"POST",headers:authHeaders(),body:JSON.stringify({prnNumber:prn})});if(r.ok){showToast("wsToast","Official URA PRN Paid Directly!");refreshWorkspace();}}
-async function saveAdminConfig(){var socks={};Object.keys(currentSockets).forEach(function(k){socks[k]={apiKey:document.getElementById("sock-"+k).value,mode:"LIVE"};});var r=await fetch("/api/admin/config",{method:"POST",headers:authHeaders(),body:JSON.stringify({pricing:{retailProUsd:parseFloat(document.getElementById("adRetail").value),proTradeUsd:parseFloat(document.getElementById("adPro").value),factoryEnterpriseUsd:parseFloat(document.getElementById("adEnt").value),offrampSpreadPct:parseFloat(document.getElementById("adSpread").value),atomicSettlementFeePct:parseFloat(document.getElementById("adAtomic").value),importerEscrowFlatUsd:parseFloat(document.getElementById("adEscrow").value)},sockets:socks})});if(r.ok){showToast("wsToast","Pricing and API Sockets Updated!");refreshWorkspace();}}
-document.getElementById("dealForm").onsubmit=async function(e){e.preventDefault();showToast("wsToast","Locking 3-Bucket Split Escrow on XRPL...");var r=await fetch("/api/deals",{method:"POST",headers:authHeaders(),body:JSON.stringify({countryCode:currentSession.countryCode,incoterm:document.getElementById("dlIncoterm").value,supplierName:document.getElementById("dlSupplier").value,productDesc:document.getElementById("dlDesc").value,goodsUsd:parseFloat(document.getElementById("dlGoods").value),freightUsd:parseFloat(document.getElementById("dlFreight").value),insuranceUsd:parseFloat(document.getElementById("dlIns").value),splitPct1:parseInt(document.getElementById("dlSplit1").value,10),splitPct2:parseInt(document.getElementById("dlSplit2").value,10)})});var d=await r.json();if(!r.ok)return showToast("wsToast",d.detail||"Error",true);showToast("wsToast","Locked Split Escrow: "+d.deal.id);refreshWorkspace();};
-document.getElementById("bidForm").onsubmit=async function(e){e.preventDefault();var r=await fetch("/api/freight/bid",{method:"POST",headers:authHeaders(),body:JSON.stringify({dealId:document.getElementById("bdDealId").value.trim(),truckPlate:document.getElementById("bdPlate").value,rectsSealId:document.getElementById("bdSeal").value,bidUsd:parseFloat(document.getElementById("bdUsd").value)})});var d=await r.json();if(!r.ok)return showToast("wsToast",d.detail||"Enter valid Shipment ID",true);showToast("wsToast","Carrier Bid Awarded!");refreshWorkspace();};
-document.getElementById("invForm").onsubmit=async function(e){e.preventDefault();var r=await fetch("/api/invoices",{method:"POST",headers:authHeaders(),body:JSON.stringify({countryCode:currentSession.countryCode,flowType:document.getElementById("ivFlow").value,buyerName:document.getElementById("ivBuyer").value,amountUsd:parseFloat(document.getElementById("ivUsd").value),productDesc:document.getElementById("ivDesc").value})});var d=await r.json();if(r.ok){showToast("wsToast","Issued EFRIS: "+d.invoice.efrisFdn);refreshWorkspace();}};
-document.getElementById("bchForm").onsubmit=async function(e){e.preventDefault();var r=await fetch("/api/batches",{method:"POST",headers:authHeaders(),body:JSON.stringify({countryCode:currentSession.countryCode,agency:document.getElementById("bcAgency").value,permitNo:document.getElementById("bcPermit").value,batchCode:document.getElementById("bcCode").value,expiryDate:"2028-11-30",productName:document.getElementById("bcProd").value,unitCount:4})});if(r.ok){showToast("wsToast","Batch Sealed on XRPL!");refreshWorkspace();}};
-document.getElementById("retForm").onsubmit=async function(e){e.preventDefault();var r=await fetch("/api/retail/entry",{method:"POST",headers:authHeaders(),body:JSON.stringify({countryCode:currentSession.countryCode,entryType:document.getElementById("rtType").value,isCredit14Day:document.getElementById("rtBnpl").value==="true",itemDesc:document.getElementById("rtDesc").value,localAmount:parseFloat(document.getElementById("rtAmt").value)})});if(r.ok){showToast("wsToast","POS Entry Saved!");refreshWorkspace();}};
-</script>
+  <div class="topbar">
+    <div class="brand">CREST VAULT AFRICA <span class="pill" id="fxBanner">1 USD = 3,700 UGX</span></div>
+    <div id="userHeader" class="hidden" style="display:flex;align-items:center;gap:10px;">
+      <span class="pill" id="roleBadge">ROLE</span>
+      <span style="font-size:12px;color:var(--muted)" id="wsSub">Ref: CVA-UG</span>
+      <button class="sec sm" onclick="loadWorkspace()">Refresh</button>
+      <button class="sec sm" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- AUTH & PUBLIC QR VERIFIER GATE -->
+  <div id="authView" class="container">
+    <div class="grid-2">
+      <div class="card">
+        <h2 style="margin-top:0">Sign In to Role Workspace</h2>
+        <p style="font-size:13px;color:var(--muted)">Non-Custodial Trade Clearing, Anti-Counterfeit Passports &amp; Tax Compliance OS</p>
+        <label>Jurisdiction</label>
+        <select id="sCountry">
+          <option value="UG">Uganda (UGX — URA / UNBS / NDA)</option>
+          <option value="KE">Kenya (KES — KRA / KEBS)</option>
+          <option value="NG">Nigeria (NGN — FIRS / NAFDAC)</option>
+          <option value="ZA">South Africa (ZAR — SARS / SABS)</option>
+          <option value="RW">Rwanda (RWF — RRA / RSB)</option>
+          <option value="GH">Ghana (GHS — GRA / GSA)</option>
+          <option value="AE">UAE (AED — Dubai Customs)</option>
+        </select>
+        <label>Select Your Business / Regulatory Role</label>
+        <select id="sRole" onchange="toggleRoleFields()">
+          <option value="IMPORTER">Importer / Kikuubo Trader (Buying Abroad)</option>
+          <option value="EXPORTER">Exporter / Factory Selling Abroad (Coffee, Agro, Pharma)</option>
+          <option value="CARRIER">Freight Trucker / Fleet Owner (RECTS Carrier)</option>
+          <option value="WHOLESALER">Domestic Factory / Wholesaler (Selling Within Country)</option>
+          <option value="RETAILER">Retail Shop / Pharmacy (POS, QR Scan &amp; Credit Passport)</option>
+          <option value="AUDITOR">External CPA / Tax Accountant</option>
+          <option value="REGULATOR">Government Inspector (URA / UNBS / NDA)</option>
+          <option value="SUPER_ADMIN">Level 6 Platform Owner / Super-Admin</option>
+        </select>
+        <label>Full Name</label>
+        <input id="sName" value="Fred Magezi" />
+        <label>Company / Agency / Shop Name</label>
+        <input id="sOrg" value="Kampala Solar & Trade Ltd" />
+        <label>Tax Identification Number (TIN)</label>
+        <input id="sTin" value="1004928172" />
+        <div id="permitField" class="hidden">
+          <label>Regulatory Permit / Export License No. (UNBS / UCDA / NDA)</label>
+          <input id="sPermit" placeholder="e.g. UNBS-QM-4412" />
+        </div>
+        <div id="plateField" class="hidden">
+          <label>Primary Truck Plate Number</label>
+          <input id="sPlate" placeholder="e.g. UBK 419T" />
+        </div>
+        <div id="pinField" class="hidden">
+          <label>Owner Master PIN</label>
+          <input id="sPin" type="password" placeholder="Enter Master PIN" />
+        </div>
+        <button style="margin-top:16px;width:100%" onclick="signup()">Enter Role Workspace</button>
+      </div>
+
+      <div class="card">
+        <h2 style="margin-top:0">Public Anti-Counterfeit QR Verifier</h2>
+        <p style="font-size:13px;color:var(--muted)">Consumers, pharmacists, and border officers can verify product authenticity instantly without logging in.</p>
+        <label>Product Serial Code</label>
+        <input id="pubSerial" placeholder="e.g. BUGISU-AA-0001" />
+        <label>Scan District / Border Post</label>
+        <input id="pubCity" value="Nakawa, Kampala" />
+        <button style="margin-top:14px" onclick="verifyPublicQR()">Verify Product Authenticity</button>
+        <div id="pubResult" style="margin-top:14px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN WORKSPACE -->
+  <div id="appView" class="container hidden">
+    <div class="grid-4" style="margin-bottom:18px" id="kpiRow"></div>
+
+    <div class="tabs" id="tabBar">
+      <button class="tab" data-tab="tabTrade" onclick="showTab('tabTrade')">1. Cross-Border Escrow &amp; Shipments</button>
+      <button class="tab" data-tab="tabExport" onclick="showTab('tabExport')">2. Export &amp; EFRIS Invoicing</button>
+      <button class="tab" data-tab="tabCarrier" onclick="showTab('tabCarrier')">3. Freight Carrier Loads &amp; Bids</button>
+      <button class="tab" data-tab="tabBatch" onclick="showTab('tabBatch')">4. Anti-Counterfeit Batch QR</button>
+      <button class="tab" data-tab="tabRetail" onclick="showTab('tabRetail')">5. Retail POS &amp; Bank Credit Passport</button>
+      <button class="tab" data-tab="tabReg" onclick="showTab('tabReg')">6. URA / UNBS Regulatory &amp; Tax Ledger</button>
+      <button class="tab" data-tab="tabAdmin" onclick="showTab('tabAdmin')">7. Level 6 Owner Console</button>
+    </div>
+
+    <!-- TAB 1: IMPORTER & EXPORTER CROSS-BORDER ESCROW -->
+    <div id="tabTrade" class="tab-pane">
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-top:0" id="tradeFormTitle">New 3-Bucket Split Escrow Order</h3>
+          <p style="font-size:12px;color:var(--muted)">Non-Custodial Settlement: Funds route directly through licensed off-ramps to the receiving commercial bank.</p>
+          <label>Trade Direction</label>
+          <select id="dDir">
+            <option value="IMPORT">Import Order (Paying Overseas Supplier)</option>
+            <option value="EXPORT">Export Order (Receiving Overseas Buyer Payment to Local Bank)</option>
+          </select>
+          <label>Settlement Stable Unit</label>
+          <select id="dCoin"><option>RLUSD</option><option>USDC</option><option>USDQ</option><option>EURCV</option><option>XSGD</option></select>
+          <label>Incoterm</label>
+          <select id="dInco"><option>CIF</option><option>FOB</option><option>EXW</option><option>DAP</option></select>
+                    <label>Counterparty / Supplier Name</label>
+          <input id="dSup" value="Shenzhen Solar Tech Co." />
+          <label>Receiving Bank Name (Off-Ramp Direct Payout Destination)</label>
+          <input id="dBank" value="Bank of China" />
+          <label>Receiving Bank Account Number</label>
+          <input id="dAcct" value="621700123456789" />
+          <label>Goods &amp; Shipment Description</label>
+          <input id="dDesc" value="500x Hybrid Solar Inverters" />
+          <div class="grid-3">
+            <div><label>Goods Value (USD)</label><input id="dGoods" type="number" value="10000" /></div>
+            <div><label>Freight Budget (USD)</label><input id="dFreight" type="number" value="1800" /></div>
+            <div><label>M1 / M2 Split (%)</label><input id="dSplit1" type="number" value="30" /></div>
+          </div>
+          <label>Export / Regulatory Permit &amp; Bill of Lading Ref (Optional for Exports)</label>
+          <input id="dPermit" placeholder="e.g. UCDA-EXP-882 / BL-MSKU9048" />
+          <button style="margin-top:16px;width:100%" onclick="createDeal()">Lock 3-Bucket Split Escrow</button>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h3 style="margin:0">Active Shipments &amp; Milestone Releases</h3>
+            <button class="sec sm" onclick="openDoc('asycuda-customs-valuation-prn-pack','SUMMARY')">Latest QR Audit Pack</button>
+          </div>
+          <p style="font-size:12px;color:var(--muted)">Release tranches directly via off-ramp or print QR-stamped URA / Customs documents.</p>
+          <div id="dealsList" style="margin-top:12px">No escrow shipments yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: EXPORT & DOMESTIC EFRIS INVOICING -->
+    <div id="tabExport" class="tab-pane hidden">
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-top:0" id="invTitle">Export &amp; EFRIS Trade Invoice (Direct Off-Ramp to Bank)</h3>
+          <p style="font-size:12px;color:var(--muted)">Zero withdrawal step: buyer settlement routes automatically via off-ramp into your designated bank account with daily FX locked for URA.</p>
+          <label>Trade Flow</label>
+          <select id="iFlow"><option value="EXPORT">EXPORT (Zero-Rated 0% VAT — Cross-Border)</option><option value="DOMESTIC">DOMESTIC (Local UGX Gateway + Instant Gate Pass)</option></select>
+          <label>Buyer / Customer Name</label>
+          <input id="iBuyer" value="Al-Noor Specialty Roasters (Dubai)" />
+          <label>Product &amp; Lot / Batch Description</label>
+          <input id="iDesc" value="300 Bags Washed Arabica AA (Lot KSE-882)" />
+          <label>Invoice Value (USD)</label>
+          <input id="iAmt" type="number" value="60000" />
+          <label>Your Receiving Commercial Bank (Stanbic / Centenary / Equity)</label>
+          <input id="iBank" value="Stanbic Bank Uganda" />
+          <label>Your Receiving Account Number</label>
+          <input id="iAcct" value="9030012345678" />
+          <label>UNBS / UCDA Export Permit &amp; Bill of Lading Reference</label>
+          <input id="iPermit" value="UCDA-2026-309 / BL-MAEU7741" />
+          <button style="margin-top:16px;width:100%" onclick="createInvoice()">Generate EFRIS Invoice &amp; Off-Ramp Link</button>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Issued Invoices &amp; Downloadable QR Documents</h3>
+          <div id="invList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: FREIGHT CARRIER LOADS & BIDS -->
+    <div id="tabCarrier" class="tab-pane hidden">
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-top:0">Submit Freight Bid &amp; Payout Details</h3>
+          <p style="font-size:12px;color:var(--muted)">Enter your truck plate, RECTS seal, and MoMo/Bank account to receive escrowed freight directly.</p>
+          <label>Select Open Shipment</label>
+          <select id="cDealSelect"></select>
+          <label>Truck Plate Number</label>
+          <input id="cPlate" value="UBK 419T" />
+          <label>RECTS Electronic Cargo Seal ID</label>
+          <input id="cSeal" value="RECTS-UG-88291" />
+          <label>Freight Bid Amount (USD)</label>
+          <input id="cBid" type="number" value="1800" />
+          <label>Preferred Off-Ramp Payout Channel</label>
+          <select id="cChannel"><option>MTN Mobile Money</option><option>Airtel Money</option><option>Stanbic / Centenary Bank Transfer</option></select>
+          <label>Your MoMo Phone Number or Bank Account Number</label>
+          <input id="cPayoutAcct" placeholder="e.g. +256772000000 or Bank Acct" />
+          <button style="margin-top:16px;width:100%" onclick="submitFreightBid()">Submit Sealed Freight Bid</button>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Available Loads &amp; My Bid Status (Approved / Not Selected)</h3>
+          <div id="carrierDealsView"></div>
+          <h4>Submitted Freight Bids</h4>
+          <div id="bidsList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: ANTI-COUNTERFEIT BATCH QR -->
+    <div id="tabBatch" class="tab-pane hidden">
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-top:0">Mint Serialized Anti-Counterfeit Batch QR Codes</h3>
+          <label>Standards / Regulatory Agency</label>
+          <select id="bAgency"><option>UNBS</option><option>NDA</option><option>UCDA</option><option>KEBS</option><option>NAFDAC</option></select>
+          <label>Active Permit / Certificate Number</label>
+          <input id="bPermit" value="UNBS-QM-4412" />
+          <label>Production Batch Code</label>
+          <input id="bCode" value="BUGISU-AA" />
+          <label>Product Name &amp; Expiry</label>
+          <input id="bProd" value="Washed Arabica Coffee 60kg Export Lot" />
+          <button style="margin-top:16px;width:100%" onclick="createBatch()">Stamp Batch &amp; Generate Serial QR Codes</button>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Certified Batches &amp; Live Scan Surveillance</h3>
+          <div id="batchList"></div>
+          <h4>Serialized Codes &amp; Clone Alerts</h4>
+          <div id="serialList"></div>
+        </div>
+      </div>
+    </div>
+    <!-- TAB 5: RETAIL POS & BANK CREDIT PASSPORT -->
+    <div id="tabRetail" class="tab-pane hidden">
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-top:0">Retail Counter Log &amp; Stock Receipt</h3>
+          <label>Entry Type</label>
+          <select id="rType"><option value="RETAIL_SALE">Daily Counter Sale (Cash / MoMo)</option><option value="STOCK_PURCHASE">Wholesale Stock Purchase</option><option value="SHOP_EXPENSE">Allowable Expense (Rent / UMEME / Transport)</option></select>
+          <label>Item / Stock Description</label>
+          <input id="rDesc" value="20 Cartons Cooking Oil + 10 Cartons Soap" />
+          <label>Amount in Local Currency</label>
+          <input id="rAmt" type="number" value="1850000" />
+          <label style="display:flex;align-items:center;gap:8px;margin-top:12px">
+            <input id="rCredit" type="checkbox" style="width:auto" /> Track as 14-Day Supplier Credit
+          </label>
+          <button style="margin-top:16px;width:100%" onclick="addRetailEntry()">Record Verified Entry</button>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Bank-Verified Credit Passport &amp; URA Retail Summary</h3>
+          <p style="font-size:13px;color:var(--muted)">Generate a tamper-proof 6-Month Trading Statement for Stanbic, Centenary, Equity, or SACCO loan underwriting.</p>
+          <button onclick="openDoc('retail-credit-passport','CREDIT-STATEMENT')">Download QR-Stamped Bank Credit Passport</button>
+          <div id="retailLedgerPreview" style="margin-top:14px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: URA / UNBS / NDA REGULATORY SURVEILLANCE -->
+    <div id="tabReg" class="tab-pane hidden">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <h3 style="margin:0">URA / UNBS / NDA Regulatory Surveillance &amp; EFRIS Tax Ledger</h3>
+            <p style="font-size:12px;color:var(--muted);margin:4px 0 0">Immutable FX-locked tax entries, customs valuations, and counterfeit scan alerts.</p>
+          </div>
+          <button onclick="openDoc('ura-efris-tax-audit-pack','SUMMARY')">Export Official QR Audit Pack</button>
+        </div>
+        <div id="taxTable" style="margin-top:14px"></div>
+      </div>
+    </div>
+
+    <!-- TAB 7: LEVEL 6 OWNER CONSOLE (ALL 6 OFF-RAMP & REGULATORY SOCKETS) -->
+    <div id="tabAdmin" class="tab-pane hidden">
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-top:0">SaaS Pricing &amp; Live External API Sockets</h3>
+          <div class="grid-3">
+            <div><label>Pro SaaS ($/mo)</label><input id="aPro" type="number" value="49" /></div>
+            <div><label>Enterprise ($/mo)</label><input id="aEnt" type="number" value="199" /></div>
+            <div><label>Escrow Fee ($)</label><input id="aEsc" type="number" value="35" /></div>
+          </div>
+          <label>1. Off-Ramp Partner Endpoint (Yellow Card / Kotani Pay / Fonbnk)</label>
+          <input id="sOffUrl" placeholder="https://offramp-partner.com" />
+          <label>Off-Ramp Partner API Key</label>
+          <input id="sOffKey" type="password" placeholder="live_offramp_key_..." />
+          <label>2. Local UGX Payment Gateway Endpoint (Pesapal / Flutterwave / MoMo)</label>
+          <input id="sLocUrl" placeholder="https://local-gateway.ug" />
+          <label>Local Gateway API Key</label>
+          <input id="sLocKey" type="password" placeholder="live_local_gateway_key_..." />
+          <label>3. URA EFRIS / Tax Authority API Endpoint</label>
+          <input id="sUraUrl" placeholder="https://ura.go.ug" />
+          <label>URA EFRIS API Key</label>
+          <input id="sUraKey" type="password" placeholder="ura_efris_key_..." />
+          <label>4. ASYCUDA / RECTS Customs &amp; Border Seal API Endpoint</label>
+          <input id="sCusUrl" placeholder="https://eac.int" />
+          <label>Customs / RECTS API Key</label>
+          <input id="sCusKey" type="password" placeholder="customs_rects_key_..." />
+          <label>5. UNBS / NDA / UCDA Standards Registry API Endpoint</label>
+          <input id="sStdUrl" placeholder="https://unbs.go.ug" />
+          <label>Standards Registry API Key</label>
+          <input id="sStdKey" type="password" placeholder="unbs_nda_key_..." />
+          <label>6. Live Exchange Rate Oracle Endpoint (BoU / Market FX)</label>
+          <input id="sFxUrl" placeholder="https://exchangerate.host" />
+          <label>FX Oracle API Key</label>
+          <input id="sFxKey" type="password" placeholder="fx_oracle_key_..." />
+          <button style="margin-top:16px;width:100%" onclick="saveAdmin()">Save Pricing &amp; Live API Sockets</button>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Platform SaaS &amp; Escrow Fee Revenue</h3>
+          <div id="revList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script>
+    let token = localStorage.getItem("cva_token") || "";
+    let wsData = null;
+
+    function toast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg; t.classList.remove("hidden");
+      setTimeout(() => t.classList.add("hidden"), 4500);
+    }
+
+    function toggleRoleFields() {
+      const r = document.getElementById("sRole").value;
+      document.getElementById("pinField").classList.toggle("hidden", r !== "SUPER_ADMIN");
+      document.getElementById("permitField").classList.toggle("hidden", !["EXPORTER","WHOLESALER"].includes(r));
+      document.getElementById("plateField").classList.toggle("hidden", r !== "CARRIER");
+    }
+
+    async function api(path, method = "GET", body = null) {
+      const opts = { method, headers: { "Content-Type": "application/json" } };
+      if (token) opts.headers["x-session-token"] = token;
+      if (body) opts.body = JSON.stringify(body);
+      const res = await fetch(path, opts);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Request failed");
+      return data;
+    }
+
+    async function signup() {
+      try {
+        const res = await api("/api/auth/signup", "POST", {
+          countryCode: document.getElementById("sCountry").value,
+          userRole: document.getElementById("sRole").value,
+          userName: document.getElementById("sName").value,
+          orgName: document.getElementById("sOrg").value,
+          taxIdTin: document.getElementById("sTin").value,
+          permitNumber: document.getElementById("sPermit").value,
+          truckPlate: document.getElementById("sPlate").value,
+          adminPin: document.getElementById("sPin").value
+        });
+        token = res.token;
+        localStorage.setItem("cva_token", token);
+        await loadWorkspace();
+      } catch (e) { toast(e.message); }
+    }
+
+    function logout() {
+      localStorage.removeItem("cva_token"); token = "";
+      document.getElementById("appView").classList.add("hidden");
+      document.getElementById("userHeader").classList.add("hidden");
+      document.getElementById("authView").classList.remove("hidden");
+    }
+
+    function showTab(id) {
+      document.querySelectorAll(".tab-pane").forEach(p => p.classList.add("hidden"));
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.getElementById(id).classList.remove("hidden");
+      const btn = document.querySelector(`.tab[data-tab="${id}"]`);
+      if (btn) btn.classList.add("active");
+    }
+
+    function applyRoleView(role) {
+      const roleTabs = {
+        IMPORTER: ["tabTrade", "tabReg"],
+        EXPORTER: ["tabExport", "tabTrade", "tabBatch", "tabReg"],
+        CARRIER: ["tabCarrier"],
+        WHOLESALER: ["tabExport", "tabBatch", "tabRetail", "tabReg"],
+        RETAILER: ["tabRetail", "tabBatch"],
+        AUDITOR: ["tabReg"],
+        REGULATOR: ["tabReg", "tabBatch"],
+        SUPER_ADMIN: ["tabTrade", "tabExport", "tabCarrier", "tabBatch", "tabRetail", "tabReg", "tabAdmin"]
+      };
+      const allowed = roleTabs[role] || ["tabTrade"];
+      document.querySelectorAll(".tab").forEach(t => {
+        t.classList.toggle("hidden", !allowed.includes(t.dataset.tab));
+      });
+      if (role === "EXPORTER") {
+        document.getElementById("dDir").value = "EXPORT";
+        document.getElementById("tradeFormTitle").textContent = "Export Milestone Escrow & Direct Bank Settlement";
+      } else {
+        document.getElementById("dDir").value = "IMPORT";
+        document.getElementById("tradeFormTitle").textContent = "New 3-Bucket Split Escrow Order";
+      }
+     showTab(allowed[0]);
+    }
+
+    async function loadWorkspace() {
+      try {
+        wsData = await api("/api/workspace");
+        const s = wsData.session;
+        document.getElementById("authView").classList.add("hidden");
+        document.getElementById("appView").classList.remove("hidden");
+        document.getElementById("userHeader").classList.remove("hidden");
+        document.getElementById("roleBadge").textContent = s.roleTitle;
+        document.getElementById("wsSub").textContent = `${s.orgName} • Ref: ${s.clearingAccountRef}`;
+        document.getElementById("fxBanner").textContent = `1 USD = ${wsData.fxRate.toLocaleString()} ${s.currency}`;
+
+        document.getElementById("kpiRow").innerHTML = `
+          <div class="kpi"><div style="font-size:12px;color:var(--muted)">Active Escrows</div><div class="v">${wsData.escrowDeals.length}</div></div>
+          <div class="kpi"><div style="font-size:12px;color:var(--muted)">EFRIS Invoices</div><div class="v">${wsData.invoices.length}</div></div>
+          <div class="kpi"><div style="font-size:12px;color:var(--muted)">Certified Batches</div><div class="v">${wsData.batches.length}</div></div>
+          <div class="kpi"><div style="font-size:12px;color:var(--muted)">Tax &amp; Ledger Records</div><div class="v">${wsData.taxLedger.length}</div></div>
+        `;
+
+        renderDeals();
+        renderInvoices();
+        renderCarrier();
+        renderBatches();
+        renderTax();
+        renderAdmin();
+        applyRoleView(s.userRole);
+      } catch (e) { logout(); }
+    }
+
+    function renderDeals() {
+      const box = document.getElementById("dealsList");
+      if (!wsData.escrowDeals.length) { box.innerHTML = "No escrow shipments yet."; return; }
+      box.innerHTML = wsData.escrowDeals.slice().reverse().map(d => `
+        <div class="deal-box">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <strong>${d.id} — ${d.productDesc}</strong>
+            <span class="badge b-ok">${d.stage}</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">
+            Counterparty: <b>${d.supplierName}</b> | Off-Ramp Bank: <b>${d.supplierBankName} (${d.supplierAccountNumber})</b>
+          </div>
+          <div style="font-size:12px;margin-top:4px">
+            Goods: <b>$${d.goodsUsd.toLocaleString()}</b> (${d.localGoodsAmount.toLocaleString()} ${d.currency}) | Freight: <b>$${d.freightUsd.toLocaleString()}</b> | Carrier: <b>${d.carrierAwarded}</b>
+          </div>
+          ${d.exportPermitNo ? `<div style="font-size:11px;color:#047857;margin-top:3px">Permit / B/L: ${d.exportPermitNo}</div>` : ""}
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;word-break:break-all">Audit Ref: ${d.xrplLockHash}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+            ${!d.m1Released ? `<button class="sm" onclick="relBucket('${d.id}','m1')">Pay M1 (${d.splitPct1}%)</button>` : `<span class="badge b-ok">M1 Paid</span>`}
+            ${!d.customsPaid ? `<button class="sm sec" onclick="payPrn('${d.id}')">Pay URA PRN</button>` : `<span class="badge b-ok">PRN ${d.prnNumber}</span>`}
+            ${!d.freightReleased ? `<button class="sm" onclick="relBucket('${d.id}','freight')">Pay Carrier ($${d.freightUsd})</button>` : `<span class="badge b-ok">Carrier Paid</span>`}
+            ${!d.m2Released ? `<button class="sm" onclick="relBucket('${d.id}','m2')">Pay M2 (${d.splitPct2}%)</button>` : `<span class="badge b-ok">M2 Paid</span>`}
+            <button class="sm sec" onclick="openDoc('asycuda-customs-valuation-prn-pack','${d.id}')">QR Customs Pack</button>
+            <button class="sm sec" onclick="openDoc('master-bill-of-lading-packing-list','${d.id}')">QR Bill of Lading</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    async function createDeal() {
+      try {
+        const s1 = parseInt(document.getElementById("dSplit1").value || "30", 10);
+        const res = await api("/api/deals", "POST", {
+          countryCode: wsData.session.countryCode,
+          tradeDirection: document.getElementById("dDir").value,
+          settlementCoin: document.getElementById("dCoin").value,
+          incoterm: document.getElementById("dInco").value,
+          supplierName: document.getElementById("dSup").value,
+          supplierBankName: document.getElementById("dBank").value,
+          supplierAccountNumber: document.getElementById("dAcct").value,
+          productDesc: document.getElementById("dDesc").value,
+          goodsUsd: parseFloat(document.getElementById("dGoods").value),
+          freightUsd: parseFloat(document.getElementById("dFreight").value),
+          splitPct1: s1, splitPct2: 100 - s1,
+          exportPermitNo: document.getElementById("dPermit").value
+        });
+        toast(`Locked Split Escrow: ${res.deal.id}`);
+        await loadWorkspace();
+      } catch (e) { toast(e.message); }
+    }
+
+    async function relBucket(id, b) {
+      try {
+        await api(`/api/deals/${id}/release/${b}`, "POST");
+        toast(`Released ${b.toUpperCase()} via Off-Ramp`);
+        await loadWorkspace();
+      } catch (e) { toast(e.message); }
+    }
+
+    async function payPrn(id) {
+      const prn = prompt("Enter URA ASYCUDA PRN Reference Number:", "22600084912");
+      if (!prn) return;
+      try {
+        await api(`/api/deals/${id}/verify-prn`, "POST", { prnNumber: prn });
+        toast(`Customs PRN ${prn} Verified`);
+        await loadWorkspace();
+      } catch (e) { toast(e.message); }
+    }
+
+    async function createInvoice() {
+      try {
+        const res = await api("/api/invoices", "POST", {
+          countryCode: wsData.session.countryCode,
+          flowType: document.getElementById("iFlow").value,
+          buyerName: document.getElementById("iBuyer").value,
+          productDesc: document.getElementById("iDesc").value,
+          amountUsd: parseFloat(document.getElementById("iAmt").value),
+          exporterBankName: document.getElementById("iBank").value,
+          exporterAccountNumber: document.getElementById("iAcct").value,
+          exportPermitNo: document.getElementById("iPermit").value
+        });
+        toast(`Issued EFRIS Invoice ${res.invoice.id} (${res.invoice.efrisFdn})`);
+        await loadWorkspace();
+      } catch (e) { toast(e.message); }
+    }
+
+    function renderInvoices() {
+      const box = document.getElementById("invList");
+      if (!wsData.invoices.length) { box.innerHTML = "No invoices issued yet."; return; }
+      box.innerHTML = wsData.invoices.slice().reverse().map(i => `
+        <div class="deal-box">
+          <strong>${i.id} — ${i.buyerName}</strong> <span class="badge b-ok">${i.efrisFdn}</span>
+          <div style="font-size:12px;margin-top:4px">${i.productDesc} | <b>$${i.amountUsd.toLocaleString()}</b> (${i.localAmount.toLocaleString()} ${i.currency})</div>
+          <div style="font-size:12px;color:var(--muted)">Direct Off-Ramp Bank: <b>${i.exporterBankName} (${i.exporterAccountNumber})</b> | AML: <b>${i.amlStatus || "CLEARED"}</b></div>
+          <div style="margin-top:8px;display:flex;gap:6px">
+            <button class="sm sec" onclick="openDoc('efris-export-tax-invoice','${i.id}')">Download QR EFRIS Invoice</button>
+            <button class="sm sec" onclick="openDoc('factory-gate-dispatch-pass','${i.id}')">QR Gate / Export Pass</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderCarrier() {
+      const sel = document.getElementById("cDealSelect");
+      const openDeals = wsData.escrowDeals.filter(d => d.carrierAwarded === "Open for Bidding");
+      sel.innerHTML = openDeals.length
+        ? openDeals.map(d => `<option value="${d.id}">${d.id} — ${d.productDesc} ($${d.freightUsd})</option>`).join("")
+        : `<option value="">No open loads awaiting bids</option>`;
+
+      document.getElementById("carrierDealsView").innerHTML = wsData.escrowDeals.map(d => `
+        <div class="deal-box">
+          <strong>${d.id}</strong>: ${d.productDesc} — Freight: <b>$${d.freightUsd}</b>
+          <span class="badge ${d.carrierAwarded === 'Open for Bidding' ? 'b-warn' : 'b-ok'}">${d.carrierAwarded}</span>
+        </div>
+      `).join("") || "No loads available.";
+
+      document.getElementById("bidsList").innerHTML = wsData.freightBids.map(b => `
+        <div class="deal-box">
+          <strong>${b.dealId}</strong> (${b.truckPlate} • Seal: ${b.rectsSealId}) — Bid: <b>$${b.bidUsd}</b>
+          <span class="badge ${b.status === 'APPROVED' ? 'b-ok' : 'b-err'}">${b.status}</span>
+          <div style="font-size:12px;color:var(--muted)">Payout Destination: ${b.payoutChannel} (${b.payoutAccount})</div>
+        </div>
+      `).join("") || "No freight bids submitted yet.";
+    }
+
+    async function submitFreightBid() {
+      const dealId = document.getElementById("cDealSelect").value;
+      if (!dealId) return toast("No open shipment selected");
+      try {
+        const res = await api("/api/freight/bid", "POST", {
+          dealId,
+          truckPlate: document.getElementById("cPlate").value,
+          rectsSealId: document.getElementById("cSeal").value,
+          bidUsd: parseFloat(document.getElementById("cBid").value),
+          payoutChannel: document.getElementById("cChannel").value,
+          payoutAccount: document.getElementById("cPayoutAcct").value
+        });
+        toast(`Freight Bid Submitted — Status: ${res.status}`);
+        await loadWorkspace();
+      } catch (e) { toast(e.message); }
+    }
+
+    async function createBatch() {
+      try {
+        const res = await api("/api/batches", "POST", {
+          countryCode: wsData.session.countryCode,
+          agency: document.getElementById("bAgency").value,
+          permitNo: document.getElementById("bPermit").value,
+          batchCode: document.getElementById("bCode").value,
+          productName: document.getElementById("bProd").value
+        });
+        toast(`Certified Batch ${res.batch.id} & Generated Serial QR Codes`);
+        await loadWorkspace();
+      } catch (e) { toast(e.message); }
+    }
+
+    function renderBatches() {
+      document.getElementById("batchList").innerHTML = wsData.batches.slice().reverse().map(b => `
+        <div class="deal-box">
+          <strong>${b.id} — ${b.productName}</strong> <span class="badge b-ok">${b.agency}: ${b.permitNo}</span>
+          <div style="margin-top:6px"><button class="sm sec" onclick="openDoc('unbs-nda-origin-passport','${b.id}')">Download QR Batch Certificate</button></div>
+        </div>
+      `).join("") || "No batches minted yet.";
+
+      document.getElementById("serialList").innerHTML = (wsData.serialQRs || []).slice(-8).reverse().map(q => `
+        <div style="font-size:12px;padding:6px;border-bottom:1px solid var(--border)">
+          <b>${q.serialCode}</b> (${q.productName}) — Scans: <b>${q.scanCount}</b> ${q.scanCount > 1 ? `<span class="badge b-err">CLONE ALERT (${q.firstCity})</span>` : `<span class="badge b-ok">ACTIVE</span>`}
+        </div>
+      `).join("");
+    }
+
+    async function addRetailEntry() {
+      try {
+        await api("/api/retail/entry", "POST", {
+          countryCode: wsData.session.countryCode,
+          entryType: document.getElementById("rType").value,
+          itemDesc: document.getElementById("rDesc").value,
+          localAmount: parseFloat(document.getElementById("rAmt").value),
+          isCredit14Day: document.getElementById("rCredit").checked
+        });
+        toast("Verified Retail / Credit Entry Saved");
+        await loadWorkspace();
+      } catch (e) { toast(e.message); }
+    }
+
+    function renderTax() {
+      const rows = wsData.taxLedger.slice().reverse().map(t => `
+        <tr><td>${t.countryCode}</td><td><b>${t.entryType}</b></td><td>${t.referenceId}</td><td>${t.localAmount.toLocaleString()} ${t.currency}</td></tr>
+      `).join("");
+      const tbl = `<table><thead><tr><th>Country</th><th>Entry Type</th><th>Reference / FDN</th><th>Local Value</th></tr></thead><tbody>${rows || "<tr><td colspan='4'>No ledger entries yet.</td></tr>"}</tbody></table>`;
+      document.getElementById("taxTable").innerHTML = tbl;
+      document.getElementById("retailLedgerPreview").innerHTML = tbl;
+    }
+
+    function renderAdmin() {
+      const sk = wsData.sockets || {};
+      document.getElementById("sOffUrl").value = sk.offrampUrl || "";
+      document.getElementById("sOffKey").value = sk.offrampApiKey || "";
+      document.getElementById("sLocUrl").value = sk.localGatewayUrl || "";
+      document.getElementById("sLocKey").value = sk.localGatewayKey || "";
+      document.getElementById("sUraUrl").value = sk.uraEfrisUrl || "";
+      document.getElementById("sUraKey").value = sk.uraEfrisKey || "";
+      document.getElementById("sCusUrl").value = sk.customsRectsUrl || "";
+      document.getElementById("sCusKey").value = sk.customsRectsKey || "";
+      document.getElementById("sStdUrl").value = sk.standardsRegUrl || "";
+      document.getElementById("sStdKey").value = sk.standardsRegKey || "";
+      document.getElementById("sFxUrl").value = sk.fxOracleUrl || "";
+      document.getElementById("sFxKey").value = sk.fxOracleKey || "";
+
+      document.getElementById("revList").innerHTML = (wsData.corporateRevenue || []).map(r => `
+        <div class="deal-box"><b>${r.feeType}</b> (${r.referenceId}) — <b>$${r.amountUsd}</b></div>
+      `).join("") || "No fee events recorded yet.";
+    }
+
+    async function saveAdmin() {
+      try {
+        await api("/api/admin/config", "POST", {
+          pricing: {
+            proTradeUsd: parseFloat(document.getElementById("aPro").value),
+            factoryEnterpriseUsd: parseFloat(document.getElementById("aEnt").value),
+            importerEscrowFlatUsd: parseFloat(document.getElementById("aEsc").value)
+          },
+          sockets: {
+            offrampUrl: document.getElementById("sOffUrl").value,
+            offrampApiKey: document.getElementById("sOffKey").value,
+            localGatewayUrl: document.getElementById("sLocUrl").value,
+            localGatewayKey: document.getElementById("sLocKey").value,
+            uraEfrisUrl: document.getElementById("sUraUrl").value,
+            uraEfrisKey: document.getElementById("sUraKey").value,
+            customsRectsUrl: document.getElementById("sCusUrl").value,
+            customsRectsKey: document.getElementById("sCusKey").value,
+            standardsRegUrl: document.getElementById("sStdUrl").value,
+            standardsRegKey: document.getElementById("sStdKey").value,
+            fxOracleUrl: document.getElementById("sFxUrl").value,
+            fxOracleKey: document.getElementById("sFxKey").value
+          }
+        });
+        toast("Owner Pricing & All 6 Live API Sockets Saved");
+      } catch (e) { toast(e.message); }
+    }
+
+    async function verifyPublicQR() {
+      try {
+        const code = document.getElementById("pubSerial").value;
+        const res = await api(`/api/public/verify/${encodeURIComponent(code)}`, "POST", { district: document.getElementById("pubCity").value });
+        document.getElementById("pubResult").innerHTML = `<div class="deal-box"><span class="badge ${res.authentic ? 'b-ok' : 'b-err'}">${res.status}</span><p style="margin:6px 0 0;font-size:13px">${res.message}</p></div>`;
+      } catch (e) {
+        document.getElementById("pubResult").innerHTML = `<div class="deal-box"><span class="badge b-err">INVALID SERIAL</span><p style="margin:6px 0 0;font-size:13px">${e.message}</p></div>`;
+      }
+    }
+
+    function openDoc(type, refId) {
+      window.open(`/api/docs/${type}/${encodeURIComponent(refId)}?token=${encodeURIComponent(token)}`, "_blank");
+    }
+
+    if (token) loadWorkspace();
+  </script>
 </body>
 </html>
