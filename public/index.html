@@ -5,51 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Crest Vault Africa | Institutional Trade, Compliance &amp; Clearing OS</title>
   <style>
-    :root { --emerald: #059669; --emerald-dark: #047857; --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; --text: #0f172a; --muted: #64748b; }
+    :root { --emerald: #059669; --emerald-dark: #047857; --bg: #f8fafc; --card: #ffffff; --topbar: #ffffff; --border: #e2e8f0; --text: #0f172a; --muted: #64748b; --input-bg: #ffffff; --deal-bg: #fcfdfd; --th-bg: #f8fafc; }
+    body.dark { --emerald: #10b981; --emerald-dark: #059669; --bg: #0b1120; --card: #111827; --topbar: #0f172a; --border: #1e293b; --text: #f1f5f9; --muted: #94a3b8; --input-bg: #0f172a; --deal-bg: #162032; --th-bg: #1e293b; }
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { margin: 0; background: var(--bg); color: var(--text); }
-    .topbar { background: #fff; border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; }
-    .brand { font-weight: 800; font-size: 18px; color: var(--emerald); display: flex; align-items: center; gap: 8px; }
-    .pill { background: #ecfdf5; color: var(--emerald-dark); padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; border: 1px solid #a7f3d0; }
+    body { margin: 0; background: var(--bg); color: var(--text); transition: background 0.2s, color 0.2s; position: relative; min-height: 100vh; }
+    .watermark { position: fixed; top: 52%; left: 50%; transform: translate(-50%, -50%); width: 340px; opacity: 0.045; pointer-events: none; z-index: 0; filter: grayscale(20%); }
+    body.dark .watermark { opacity: 0.06; }
+    .topbar, .container { position: relative; z-index: 1; }
+    .topbar { background: var(--topbar); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .brand { font-weight: 800; font-size: 18px; color: var(--emerald); display: flex; align-items: center; gap: 10px; }
+    .brand img { height: 34px; width: 34px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border); background: #fff; padding: 2px; }
+    .pill { background: rgba(16, 185, 129, 0.12); color: var(--emerald); padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; border: 1px solid rgba(16, 185, 129, 0.3); }
     .container { max-width: 1240px; margin: 24px auto; padding: 0 20px; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 18px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
     .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
     @media (max-width: 900px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
     label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 4px; margin-top: 10px; }
-    input, select { width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: #fff; }
+    input, select { width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: var(--input-bg); color: var(--text); }
     button { background: var(--emerald); color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 13px; }
     button:hover { background: var(--emerald-dark); }
-    button.sec { background: #f1f5f9; color: var(--text); border: 1px solid var(--border); }
+    button.sec { background: var(--th-bg); color: var(--text); border: 1px solid var(--border); }
     button.sm { padding: 6px 10px; font-size: 12px; }
     .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-    .tab { background: #fff; color: var(--muted); border: 1px solid var(--border); padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 13px; }
+    .tab { background: var(--card); color: var(--muted); border: 1px solid var(--border); padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 13px; }
     .tab.active { background: var(--emerald); color: #fff; border-color: var(--emerald); }
     .hidden { display: none !important; }
-    .kpi { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+    .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
     .kpi .v { font-size: 20px; font-weight: 800; color: var(--text); margin-top: 4px; }
     .badge { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
     .b-ok { background: #dcfce7; color: #166534; }
     .b-warn { background: #fef9c3; color: #854d0e; }
     .b-err { background: #fee2e2; color: #991b1b; }
-    .toast { position: fixed; bottom: 20px; right: 20px; background: #0f172a; color: #fff; padding: 12px 18px; border-radius: 8px; font-size: 13px; z-index: 999; max-width: 420px; }
-    .deal-box { border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 12px; background: #fcfdfd; }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: #0f172a; color: #fff; padding: 12px 18px; border-radius: 8px; font-size: 13px; z-index: 999; max-width: 420px; border: 1px solid #334155; }
+    .deal-box { border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 12px; background: var(--deal-bg); }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th, td { padding: 9px; border-bottom: 1px solid var(--border); text-align: left; }
-    th { background: #f8fafc; color: var(--muted); font-size: 12px; }
+    th { background: var(--th-bg); color: var(--muted); font-size: 12px; }
   </style>
+
 </head>
 <body>
+  <img src="/static/logo.png" class="watermark" alt="" />
   <div class="topbar">
-    <div class="brand">CREST VAULT AFRICA <span class="pill" id="fxBanner">1 USD = 3,700 UGX</span></div>
-    <div id="userHeader" class="hidden" style="display:flex;align-items:center;gap:10px;">
-      <span class="pill" id="roleBadge">ROLE</span>
-      <span style="font-size:12px;color:var(--muted)" id="wsSub">Ref: CVA-UG</span>
-      <button class="sec sm" onclick="loadWorkspace()">Refresh</button>
-      <button class="sec sm" onclick="logout()">Sign Out</button>
+    <div class="brand">
+      <img src="/static/logo.png" alt="Crest Vault Africa" />
+      <span>CREST VAULT AFRICA</span>
+      <span class="pill" id="fxBanner">1 USD = 3,700 UGX</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="sec sm" id="themeBtn" onclick="toggleTheme()">🌙 Dark Mode</button>
+      <div id="userHeader" class="hidden" style="display:flex;align-items:center;gap:10px;">
+        <span class="pill" id="roleBadge">ROLE</span>
+        <span style="font-size:12px;color:var(--muted)" id="wsSub">Ref: CVA-UG</span>
+        <button class="sec sm" onclick="loadWorkspace()">Refresh</button>
+        <button class="sec sm" onclick="logout()">Sign Out</button>
+      </div>
     </div>
   </div>
+
 
   <!-- AUTH & PUBLIC QR VERIFIER GATE -->
   <div id="authView" class="container">
@@ -703,6 +718,15 @@
     function openDoc(type, refId) {
       window.open(`/api/docs/${type}/${encodeURIComponent(refId)}?token=${encodeURIComponent(token)}`, "_blank");
     }
+function toggleTheme() {
+  const isDark = document.body.classList.toggle("dark");
+  localStorage.setItem("cva_theme", isDark ? "dark" : "light");
+  document.getElementById("themeBtn").textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
+}
+if (localStorage.getItem("cva_theme") === "dark") {
+  document.body.classList.add("dark");
+  document.getElementById("themeBtn").textContent = "☀️ Light Mode";
+}
 
     if (token) loadWorkspace();
   </script>
