@@ -32,7 +32,7 @@ Crest Vault Africa is engineered strictly as a **non-custodial trade compliance 
 
 * **Zero Fiat Custody:** Customer fiat (`UGX`/`KES`/`NGN`) never enters Crest Vault Africa's bank accounts. Payments route directly between buyers and licensed regional Payment Service Providers / Off-Ramps (Yellow Card, Kotani Pay, Fonbnk, Pesapal) configured via the Level 6 API Socket Manager (`/api/admin/config`).
 * **Zero Key Custody in Production:** Once live off-ramp API credentials are connected in production, all liquidity conversion and XRPL transaction signing occur exclusively inside the licensed off-ramp partners' regulated vaults. Crest Vault Africa executes read-only on-ledger receipt verification (`Tx`), generates QR-stamped regulatory documents, and collects flat SaaS/escrow software fees (`$15`–`$199/mo`, `$35/escrow`).
-* **Live Sandbox Relayer Mode:** In this public Testnet MVP, an isolated faucet-funded sandbox relayer (`get_3_actors` in `main.py` using `AccountSetAsfFlag.ASF_DEFAULT_RIPPLE`) simulates the off-ramp liquidity partner so grant evaluators and testers can execute end-to-end 3-bucket escrow locks and `RLUSD` milestone payouts in one click without installing browser wallet extensions.
+* **Live Sandbox Relayer Mode:** In this public Testnet MVP, an isolated faucet-funded sandbox relayer (`get_3_actors` in `main.py` using `AccountSetAsfFlag.ASF_DEFAULT_RIPPLE`) simulates the off-ramp liquidity partner so sandbox users and partners can execute end-to-end 3-bucket escrow locks and `RLUSD` milestone payouts in one click without installing browser wallet extensions.
 
 ---
 
@@ -53,7 +53,7 @@ Signing in dynamically adapts the workspace, forms, and printable QR documents t
 ---
 
 ## 5. Open-Source Ecosystem Contribution (MIT License)
-As part of our XRPL Developer Grant commitment, we are extracting and maintaining an open-source Python module—**`xrpl-offramp-trade-escrow`** (MIT Licensed)—providing:
+As part of our open-source ecosystem contribution, we are extracting and maintaining an open-source Python module—**`xrpl-offramp-trade-escrow`** (MIT Licensed)—providing:
 1. **Standardized 3-Bucket Trade Escrow & Off-Ramp Memo Builder:** Deterministic hex-encoded memo schemas (`OFFRAMP_SETTLEMENT`, `OFFRAMP_M1`, `OFFRAMP_FREIGHT`, `OFFRAMP_M2`) for cross-border B2B bank routing.
 2. **Non-Custodial On-Chain Receipt Verifier:** Read-only `tesSUCCESS` and memo validator for payment orchestrators.
 3. **Custom `DefaultRipple` Testnet Issuer Harness:** Automated Testnet issuer + `TrustSet` setup utility for stablecoin integration testing.
